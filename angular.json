@@ -34,6 +34,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "port": 2000
+          },
           "configurations": {
             "production": {"buildTarget": "kielstack:build:production"},
             "development": {"buildTarget": "kielstack:build:development"}
