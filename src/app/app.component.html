@@ -163,14 +163,46 @@
               <p class="mt-2 text-sm">Kiel · Schleswig-Holstein</p>
             </div>
             <div class="p-8 sm:p-10">
-                <form action="https://formsubmit.co/moin@kielstack.de" method="POST" class="space-y-5">
-                  <input type="hidden" name="_subject" value="Neue Projektanfrage über kielstack.de" />
-                  <input type="hidden" name="_next" value="https://kielstack.de/#kontakt" />
-                  <input type="hidden" name="_captcha" value="false" />
-                  <div><label for="name" class="mb-2 block text-sm font-bold">Name / Unternehmen</label><input id="name" name="name" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" /></div>
-                  <div><label for="email" class="mb-2 block text-sm font-bold">E-Mail</label><input id="email" name="email" type="email" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" /></div>
-                  <div><label for="message" class="mb-2 block text-sm font-bold">Worum geht es?</label><textarea id="message" name="message" rows="5" required class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white"></textarea></div>
-                  <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-electric via-neon to-magenta px-6 py-4 font-black text-white shadow-neon transition hover:-translate-y-0.5 hover:shadow-purple">Anfrage senden →</button>
+                <form (ngSubmit)="submitContact()" #kontaktForm="ngForm" class="space-y-5">
+                  @if (sent()) {
+                    <p class="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300" role="status">
+                      Danke für Ihre Anfrage. Wir melden uns zeitnah bei Ihnen.
+                    </p>
+                  }
+                  @if (errorMessage()) {
+                    <p class="rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800 dark:bg-red-500/10 dark:text-red-300" role="alert">
+                      {{ errorMessage() }}
+                    </p>
+                  }
+                  <div>
+                    <label for="name" class="mb-2 block text-sm font-bold">Name / Unternehmen</label>
+                    <input id="name" name="name" [(ngModel)]="name" required minlength="2" autocomplete="name" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" />
+                    @if (fieldErrors()['name']) {
+                      <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['name'] }}</p>
+                    }
+                  </div>
+                  <div>
+                    <label for="email" class="mb-2 block text-sm font-bold">E-Mail</label>
+                    <input id="email" name="email" type="email" [(ngModel)]="email" required autocomplete="email" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" />
+                    @if (fieldErrors()['email']) {
+                      <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['email'] }}</p>
+                    }
+                  </div>
+                  <div>
+                    <label for="message" class="mb-2 block text-sm font-bold">Worum geht es?</label>
+                    <textarea id="message" name="message" rows="5" [(ngModel)]="message" required minlength="10" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white"></textarea>
+                    @if (fieldErrors()['message']) {
+                      <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['message'] }}</p>
+                    }
+                  </div>
+                  <!-- Honeypot: für Menschen unsichtbar, Bots füllen ihn aus. -->
+                  <div class="hidden" aria-hidden="true">
+                    <label for="website">Website</label>
+                    <input id="website" name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off" />
+                  </div>
+                  <button type="submit" [disabled]="kontaktForm.form.invalid || sending()" class="w-full rounded-xl bg-gradient-to-r from-electric via-neon to-magenta px-6 py-4 font-black text-white shadow-neon transition hover:-translate-y-0.5 hover:shadow-purple disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+                    {{ sending() ? 'Wird gesendet …' : 'Anfrage senden →' }}
+                  </button>
                   <p class="text-xs leading-relaxed text-slate-500">Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer Angaben zur Beantwortung der Anfrage einverstanden.</p>
                 </form>
             </div>
