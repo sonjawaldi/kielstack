@@ -163,7 +163,7 @@
               <p class="mt-2 text-sm">Kiel · Schleswig-Holstein</p>
             </div>
             <div class="p-8 sm:p-10">
-                <form (ngSubmit)="submitContact()" #kontaktForm="ngForm" class="space-y-5">
+                <form (ngSubmit)="submitContact(kontaktForm)" #kontaktForm="ngForm" class="space-y-5">
                   @if (sent()) {
                     <p class="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300" role="status">
                       Danke für Ihre Anfrage. Wir melden uns zeitnah bei Ihnen.
@@ -183,7 +183,7 @@
                   </div>
                   <div>
                     <label for="email" class="mb-2 block text-sm font-bold">E-Mail</label>
-                    <input id="email" name="email" type="email" [(ngModel)]="email" required autocomplete="email" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" />
+                    <input id="email" name="email" type="email" [(ngModel)]="email" required email autocomplete="email" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" />
                     @if (fieldErrors()['email']) {
                       <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['email'] }}</p>
                     }
@@ -200,7 +200,7 @@
                     <label for="website">Website</label>
                     <input id="website" name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off" />
                   </div>
-                  <button type="submit" [disabled]="kontaktForm.form.invalid || sending()" class="w-full rounded-xl bg-gradient-to-r from-electric via-neon to-magenta px-6 py-4 font-black text-white shadow-neon transition hover:-translate-y-0.5 hover:shadow-purple disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
+                  <button type="submit" [disabled]="sending()" class="w-full rounded-xl bg-gradient-to-r from-electric via-neon to-magenta px-6 py-4 font-black text-white shadow-neon transition hover:-translate-y-0.5 hover:shadow-purple disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
                     {{ sending() ? 'Wird gesendet …' : 'Anfrage senden →' }}
                   </button>
                   <p class="text-xs leading-relaxed text-slate-500">Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer Angaben zur Beantwortung der Anfrage einverstanden.</p>

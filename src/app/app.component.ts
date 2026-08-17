@@ -1,8 +1,39 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ContactService, describeFormError } from './services/contact.service';
+
+
+// Dieselben Regeln wie im Server, damit beide Wege gleich klingen.
+const FIELD_MESSAGES: Record<string, Record<string, string>> = {
+  name: {
+    required: 'Bitte einen Namen angeben.',
+    minlength: 'Name muss mindestens 2 Zeichen lang sein.',
+  },
+  email: {
+    required: 'Bitte eine E-Mail-Adresse angeben.',
+    email: 'Bitte eine gültige E-Mail-Adresse angeben.',
+  },
+  message: {
+    required: 'Bitte eine Nachricht eingeben.',
+    minlength: 'Nachricht muss mindestens 10 Zeichen lang sein.',
+  },
+};
+
+function collectClientErrors(form: NgForm): Record<string, string> {
+  const found: Record<string, string> = {};
+
+  for (const [field, messages] of Object.entries(FIELD_MESSAGES)) {
+    const errors = form.controls[field]?.errors;
+    if (!errors) continue;
+
+    const key = Object.keys(errors).find((name) => messages[name]);
+    if (key) found[field] = messages[key];
+  }
+
+  return found;
+}
 
 @Component({
   selector: 'app-root',
@@ -40,8 +71,21 @@ export class AppComponent {
     this.menuOpen.set(false);
   }
 
-  submitContact(): void {
+  submitContact(form: NgForm): void {
     if (this.sending()) return;
+
+    // Erst hier prüfen, nicht per disabled am Button: ein stummer, grauer
+    // Button verrät nicht, welches Feld ihn blockiert. Und der Server lässt
+    // nur fünf Anfragen je Viertelstunde zu – ein Tippfehler soll davon
+    // keine verbrauchen.
+    const clientErrors = collectClientErrors(form);
+    if (Object.keys(clientErrors).length > 0) {
+      form.control.markAllAsTouched();
+      this.sent.set(false);
+      this.fieldErrors.set(clientErrors);
+      this.errorMessage.set('Bitte prüfen Sie die markierten Felder.');
+      return;
+    }
 
     this.sending.set(true);
     this.errorMessage.set('');
