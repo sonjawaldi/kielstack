@@ -50,7 +50,21 @@ describe('HomeComponent', () => {
 
     expect(query('.pain-solution')!.textContent).toContain('moderne Website');
     expect(query('.pain')!.getAttribute('aria-pressed')).toBe('true');
-    expect(query('.chips-mini')!.textContent).toContain('Website von 2015');
+    expect(query('.opt.on')!.textContent).toContain('Website modernisieren');
+    expect(query('.chips-mini')).toBeNull();
+  });
+
+  it('markiert zu mehreren Problemen alle passenden Themen und jedes nur einmal', () => {
+    component.togglePain('excel');
+    component.togglePain('phone');
+    component.togglePain('copy');
+    fixture.detectChanges();
+
+    const selected = Array.from<HTMLElement>(fixture.nativeElement.querySelectorAll('.opt.on'));
+    expect(selected.map((option) => option.querySelector('b')!.textContent)).toEqual([
+      'Webanwendung',
+      'Automatisierung',
+    ]);
   });
 
   it('nimmt ein Problem beim zweiten Antippen wieder heraus', () => {
@@ -73,12 +87,12 @@ describe('HomeComponent', () => {
     expect(query('#faq-q-0')!.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('uebernimmt das Kennenlernangebot in die Anfrage', fakeAsync(() => {
+  it('uebernimmt die Kennenlernaktion in die Anfrage', fakeAsync(() => {
     (query('.offer button') as HTMLButtonElement).click();
     tick();
     fixture.detectChanges();
 
-    expect(query('app-inquiry-form')!.textContent).toContain('Kennenlernangebot');
+    expect(query('app-inquiry-form')!.textContent).toContain('Kennenlernaktion');
     expect(query('.opt.on')!.textContent).toContain('Neue Website');
   }));
 });

@@ -67,4 +67,26 @@ describe('AppComponent Farbschema', () => {
 
     expect(create().darkMode()).toBeFalse();
   });
+
+  describe('Klick aufs Logo', () => {
+    function clickLogo(detail: number): boolean {
+      const fixture = TestBed.createComponent(AppComponent);
+      fixture.detectChanges();
+      const logo = fixture.nativeElement.querySelector('.logo') as HTMLElement;
+      document.body.appendChild(fixture.nativeElement);
+      logo.focus();
+      logo.dispatchEvent(new MouseEvent('click', { detail, cancelable: true, bubbles: true }));
+      const focused = document.activeElement === logo;
+      fixture.nativeElement.remove();
+      return focused;
+    }
+
+    it('nimmt nach einem Mausklick den Fokus weg', () => {
+      expect(clickLogo(1)).toBeFalse();
+    });
+
+    it('behaelt den Fokus bei Bedienung per Tastatur', () => {
+      expect(clickLogo(0)).toBeTrue();
+    });
+  });
 });

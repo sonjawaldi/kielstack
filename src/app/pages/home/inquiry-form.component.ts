@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Inject, computed, inject, input, signal } from '@angular/core';
+import { Component, Inject, computed, effect, inject, input, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ContactService, describeFormError } from '../../services/contact.service';
 
@@ -10,7 +10,7 @@ const TOPICS = [
   { id: 'app', label: 'Webanwendung', desc: 'Portal, Tool oder Verwaltung' },
   { id: 'auto', label: 'Automatisierung', desc: 'Abläufe und Systeme verbinden' },
 ] as const;
-type TopicId = (typeof TOPICS)[number]['id'];
+export type TopicId = (typeof TOPICS)[number]['id'];
 
 const PAGES = ['1–3 Seiten', '4–5 Seiten', 'Mehr als 5'];
 const FEATURES = ['Nutzerkonten & Login', 'Termine & Buchungen', 'Zahlungen', 'Datenverwaltung'];
@@ -55,6 +55,8 @@ export class InquiryFormComponent {
 
   /** Was in "Kommt Ihnen das bekannt vor?" angetippt wurde. */
   readonly pains = input<string[]>([]);
+  /** Die Themen, die zu diesen Punkten passen. Sie werden in Schritt 1 vorausgewählt. */
+  readonly painTopics = input<readonly TopicId[]>([]);
 
   readonly topics = TOPICS;
   readonly pageOptions = PAGES;
@@ -65,7 +67,7 @@ export class InquiryFormComponent {
 
   /** 1-3 sind die Schritte, 4 das Danke. */
   readonly step = signal(1);
-  readonly topic = signal<TopicId | null>(null);
+  readonly selectedTopics = signal<readonly TopicId[]>([]);
   readonly pages = signal<string | null>(null);
   readonly time = signal<string | null>(null);
   readonly features = signal<string[]>([]);
@@ -73,15 +75,15 @@ export class InquiryFormComponent {
   readonly fromOffer = signal(false);
 
   readonly stepName = computed(() => STEP_NAMES[this.step() - 1]);
-  readonly isSite = computed(() => this.topic() === 'web' || this.topic() === 'redo');
+  readonly isSite = computed(() => this.hasTopic('web') || this.hasTopic('redo'));
   readonly offerFits = computed(
     () => this.isSite() && (this.pages() === PAGES[0] || this.pages() === PAGES[1]),
   );
   readonly summary = computed(() => {
-    const parts: (string | undefined)[] = [TOPICS.find((topic) => topic.id === this.topic())?.label];
+    const parts: (string | undefined)[] = [this.topicLabels()];
     if (this.isSite()) parts.push(this.pages() ?? undefined);
-    if (this.topic() === 'app') parts.push(this.features().join(', '));
-    if (this.topic() === 'auto') parts.push(this.tools().join(', '));
+    if (this.hasTopic('app')) parts.push(this.features().join(', '));
+    if (this.hasTopic('auto')) parts.push(this.tools().join(', '));
     parts.push(this.time() ?? undefined);
     return parts.filter(Boolean).join(' · ');
   });
@@ -98,17 +100,28 @@ export class InquiryFormComponent {
   readonly errorMessage = signal('');
   readonly fieldErrors = signal<Record<string, string>>({});
 
-  constructor(@Inject(DOCUMENT) private readonly document: Document) {}
+  /** Zuletzt übernommene Themen, damit nur Änderungen die Auswahl von Hand überschreiben. */
+  private appliedPainTopics: readonly TopicId[] = [];
 
-  /** Kommt vom Kennenlernangebot: das Thema steht damit fest, der Rest bleibt offen. */
+  constructor(@Inject(DOCUMENT) private readonly document: Document) {
+    effect(() => this.applyPainTopics(this.painTopics()));
+  }
+
+  /** Kommt von der Kennenlernaktion: das Thema steht damit fest, der Rest bleibt offen. */
   startFromOffer(): void {
     this.reset();
     this.fromOffer.set(true);
-    this.topic.set('web');
+    this.selectedTopics.set(['web']);
   }
 
-  chooseTopic(id: TopicId): void {
-    this.topic.set(id);
+  hasTopic(id: TopicId): boolean {
+    return this.selectedTopics().includes(id);
+  }
+
+  toggleTopic(id: TopicId): void {
+    this.selectedTopics.update((current) =>
+      current.includes(id) ? current.filter((topic) => topic !== id) : [...current, id],
+    );
     this.topicError.set(false);
   }
 
@@ -120,10 +133,7 @@ export class InquiryFormComponent {
 
   next(): void {
     // Kein disabled am Button: ein stummer, grauer Button verrät nicht, was fehlt.
-    if (!this.topic()) {
-      this.topicError.set(true);
-      return;
-    }
+    if (this.sendBackWithoutTopic()) return;
 
     this.goTo(Math.min(this.step() + 1, 3));
   }
@@ -136,6 +146,7 @@ export class InquiryFormComponent {
 
   submit(form: NgForm): void {
     if (this.sending()) return;
+    if (this.sendBackWithoutTopic()) return;
 
     // Der Server lässt nur fünf Anfragen je Viertelstunde zu – ein Tippfehler
     // soll davon keine verbrauchen.
@@ -191,18 +202,17 @@ export class InquiryFormComponent {
    * Mindestlaenge auch dann, wenn das freie Textfeld leer bleibt.
    */
   private buildMessage(): string {
-    const label = TOPICS.find((topic) => topic.id === this.topic())?.label;
-    const rows = [`Thema: ${label}`];
+    const rows = [`Thema: ${this.topicLabels()}`];
 
-    if (this.fromOffer()) rows.push('Anlass: Kennenlernangebot');
+    if (this.fromOffer()) rows.push('Anlass: Kennenlernaktion');
     if (this.isSite() && this.pages()) rows.push(`Seiten: ${this.pages()}`);
-    if (this.topic() === 'redo' && this.currentSite.trim()) {
+    if (this.hasTopic('redo') && this.currentSite.trim()) {
       rows.push(`Aktuelle Website: ${this.currentSite.trim()}`);
     }
-    if (this.topic() === 'app' && this.features().length) {
+    if (this.hasTopic('app') && this.features().length) {
       rows.push(`Funktionen: ${this.features().join(', ')}`);
     }
-    if (this.topic() === 'auto' && this.tools().length) {
+    if (this.hasTopic('auto') && this.tools().length) {
       rows.push(`Werkzeuge heute: ${this.tools().join(', ')}`);
     }
     if (this.time()) rows.push(`Start: ${this.time()}`);
@@ -217,9 +227,40 @@ export class InquiryFormComponent {
     this.focusStep();
   }
 
+  /** In fester Reihenfolge, egal in welcher Folge die Kacheln angetippt wurden. */
+  private topicLabels(): string {
+    return TOPICS.filter((topic) => this.hasTopic(topic.id))
+      .map((topic) => topic.label)
+      .join(', ');
+  }
+
+  /**
+   * Punkte lassen sich auch dann noch abwählen, wenn das Formular schon weiter ist.
+   * Bleibt dadurch kein Thema übrig, geht es zurück zu Schritt 1, wo die Meldung sichtbar ist.
+   */
+  private sendBackWithoutTopic(): boolean {
+    if (this.selectedTopics().length) return false;
+
+    this.topicError.set(true);
+    this.goTo(1);
+    return true;
+  }
+
+  /** Überträgt nur, was sich geändert hat: Von Hand gewählte Kacheln bleiben stehen. */
+  private applyPainTopics(next: readonly TopicId[]): void {
+    const previous = this.appliedPainTopics;
+    this.appliedPainTopics = next;
+
+    this.selectedTopics.update((current) => [
+      ...current.filter((topic) => !previous.includes(topic) || next.includes(topic)),
+      ...next.filter((topic) => !previous.includes(topic) && !current.includes(topic)),
+    ]);
+    if (next.length) this.topicError.set(false);
+  }
+
   private reset(): void {
     this.step.set(1);
-    this.topic.set(null);
+    this.selectedTopics.set([...this.painTopics()]);
     this.pages.set(null);
     this.time.set(null);
     this.features.set([]);

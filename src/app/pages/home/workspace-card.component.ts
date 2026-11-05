@@ -1,7 +1,10 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnDestroy, OnInit, signal } from '@angular/core';
 
-/** Karte im Hero: wechselt von selbst durch die drei Schritte, bis jemand einen anklickt. */
+const AUTO_STEP_MS = 4000;
+const PLAY_STEP_MS = 1500;
+
+/** Karte im Hero: laeuft beim Laden einmal durch die drei Schritte, per Play erneut und schneller. */
 @Component({
   selector: 'app-workspace-card',
   standalone: true,
@@ -136,7 +139,7 @@ export class WorkspaceCardComponent implements OnInit, OnDestroy {
     const reduceMotion = this.document.defaultView?.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    if (!reduceMotion) this.startCycling();
+    if (!reduceMotion) this.startCycling(AUTO_STEP_MS);
   }
 
   ngOnDestroy(): void {
@@ -153,15 +156,28 @@ export class WorkspaceCardComponent implements OnInit, OnDestroy {
     if (this.cycling()) {
       this.stopCycling();
     } else {
-      this.startCycling();
+      this.startCycling(PLAY_STEP_MS);
     }
   }
 
-  private startCycling(): void {
+  /**
+   * Laeuft einmal bis zum letzten Schritt und bleibt dort stehen. Nur der
+   * automatische Durchlauf wartet, solange Maus oder Fokus auf der Karte liegen:
+   * nach einem Klick auf Play liegen beide zwangslaeufig dort.
+   */
+  private startCycling(stepMs: number): void {
+    const last = this.steps.length - 1;
+    const waitsWhileHeld = stepMs === AUTO_STEP_MS;
+
+    if (this.step() === last) this.step.set(0);
     this.cycling.set(true);
+
     this.timer = setInterval(() => {
-      if (!this.held) this.step.update((step) => (step + 1) % this.steps.length);
-    }, 4000);
+      if (waitsWhileHeld && this.held) return;
+
+      this.step.update((step) => step + 1);
+      if (this.step() === last) this.stopCycling();
+    }, stepMs);
   }
 
   private stopCycling(): void {

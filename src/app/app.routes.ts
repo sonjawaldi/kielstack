@@ -3,12 +3,12 @@ import { HomeComponent } from './pages/home/home.component';
 import { ErrorComponent } from './pages/error/error.component';
 
 /** Die Abschnitte der Startseite, die einen eigenen Pfad haben. */
-export const SECTIONS = ['leistungen', 'prozess', 'ueber-mich', 'kontakt'] as const;
+export const SECTIONS = ['angebot', 'leistungen', 'prozess', 'ueber-mich', 'kontakt'] as const;
 
 /**
  * Matcht die Startseite und jeden Abschnittspfad mit *einem* Route-Eintrag.
  *
- * Fuenf einzelne Eintraege waeren lesbarer, wuerden die Seite aber bei jedem
+ * Einzelne Eintraege waeren lesbarer, wuerden die Seite aber bei jedem
  * Klick in der Navigation neu aufbauen: Angulars Standard-RouteReuseStrategy
  * vergleicht die routeConfig, und die ist bei jedem Eintrag eine andere. Auf
  * einem Einseiter sieht man das als Flackern, und eine halb ausgefuellte

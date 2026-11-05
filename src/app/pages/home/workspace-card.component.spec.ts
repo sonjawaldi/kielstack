@@ -9,14 +9,45 @@ describe('WorkspaceCardComponent', () => {
     return fixture;
   }
 
-  it('wechselt von selbst durch die Schritte und beginnt wieder vorn', fakeAsync(() => {
+  it('laeuft beim Laden einmal durch und bleibt am Ende stehen', fakeAsync(() => {
     const fixture = create(false);
 
     tick(4000);
     expect(fixture.componentInstance.step()).toBe(1);
 
+    tick(4000);
+    expect(fixture.componentInstance.step()).toBe(2);
+
+    tick(12000);
+    expect(fixture.componentInstance.step()).toBe(2);
+    expect(fixture.componentInstance.cycling()).toBeFalse();
+  }));
+
+  it('spielt nach dem Ende per Play von vorn und schneller ab', fakeAsync(() => {
+    const fixture = create(false);
+    const card = fixture.componentInstance;
     tick(8000);
-    expect(fixture.componentInstance.step()).toBe(0);
+
+    fixture.nativeElement.querySelector('.ws-toggle').click();
+    expect(card.step()).toBe(0);
+
+    tick(1500);
+    expect(card.step()).toBe(1);
+
+    tick(1500);
+    expect(card.step()).toBe(2);
+    expect(card.cycling()).toBeFalse();
+  }));
+
+  it('laesst sich von Play nicht durch die Maus auf der Karte aufhalten', fakeAsync(() => {
+    const fixture = create(true);
+    const panel: HTMLElement = fixture.nativeElement.querySelector('.panel');
+
+    panel.dispatchEvent(new MouseEvent('mouseenter'));
+    fixture.nativeElement.querySelector('.ws-toggle').click();
+    tick(1500);
+
+    expect(fixture.componentInstance.step()).toBe(1);
 
     fixture.destroy();
   }));
@@ -52,7 +83,7 @@ describe('WorkspaceCardComponent', () => {
     expect(button.getAttribute('aria-label')).toContain('starten');
 
     button.click();
-    tick(4000);
+    tick(1500);
     expect(fixture.componentInstance.step()).toBe(1);
 
     fixture.destroy();

@@ -44,7 +44,7 @@ describe('InquiryFormComponent', () => {
   });
 
   it('zeigt in Schritt 2 nur die Fragen zum gewaehlten Thema', () => {
-    component.chooseTopic('auto');
+    component.toggleTopic('auto');
     component.next();
     fixture.detectChanges();
 
@@ -53,8 +53,59 @@ describe('InquiryFormComponent', () => {
     expect(query('#features-label')).toBeNull();
   });
 
-  it('sagt bis 5 Seiten, dass es ins Kennenlernangebot passt', () => {
-    component.chooseTopic('web');
+  it('fragt bei mehreren Themen die Details zu allen ab und nennt alle in der Nachricht', () => {
+    component.toggleTopic('auto');
+    component.toggleTopic('redo');
+    component.next();
+    fixture.detectChanges();
+
+    expect(query('#tools-label')).not.toBeNull();
+    expect(query('#pages-label')).not.toBeNull();
+    expect(query('#current-site')).not.toBeNull();
+
+    component.submit(formWith());
+
+    expect(sendContact.calls.mostRecent().args[0].message).toContain(
+      'Thema: Website modernisieren, Automatisierung',
+    );
+  });
+
+  it('waehlt die Themen der angetippten Punkte vor und nimmt sie mit ihnen wieder heraus', () => {
+    fixture.componentRef.setInput('painTopics', ['redo', 'auto']);
+    fixture.detectChanges();
+    expect(component.selectedTopics()).toEqual(['redo', 'auto']);
+
+    fixture.componentRef.setInput('painTopics', ['auto']);
+    fixture.detectChanges();
+    expect(component.selectedTopics()).toEqual(['auto']);
+  });
+
+  it('laesst von Hand gewaehlte Themen stehen, wenn sich die Punkte aendern', () => {
+    component.toggleTopic('web');
+    fixture.componentRef.setInput('painTopics', ['auto']);
+    fixture.detectChanges();
+
+    fixture.componentRef.setInput('painTopics', []);
+    fixture.detectChanges();
+
+    expect(component.selectedTopics()).toEqual(['web']);
+  });
+
+  it('geht zurueck zu Schritt 1, wenn unterwegs kein Thema mehr uebrig ist', () => {
+    component.toggleTopic('web');
+    component.step.set(3);
+    component.toggleTopic('web');
+
+    component.submit(formWith());
+    fixture.detectChanges();
+
+    expect(sendContact).not.toHaveBeenCalled();
+    expect(component.step()).toBe(1);
+    expect(query('.err')!.textContent).toContain('Thema');
+  });
+
+  it('sagt bis 5 Seiten, dass es zur Kennenlernaktion passt', () => {
+    component.toggleTopic('web');
     component.pages.set('Mehr als 5');
     expect(component.offerFits()).toBeFalse();
 
@@ -64,7 +115,7 @@ describe('InquiryFormComponent', () => {
 
   it('schreibt die Auswahl in die Nachricht, damit sie beim Server ankommt', () => {
     fixture.componentRef.setInput('pains', ['Excel-Chaos']);
-    component.chooseTopic('redo');
+    component.toggleTopic('redo');
     component.pages.set('1–3 Seiten');
     component.currentSite = 'www.muster.de';
     component.time.set('Noch offen');
@@ -85,7 +136,7 @@ describe('InquiryFormComponent', () => {
   });
 
   it('schickt ohne Freitext trotzdem eine Nachricht, die der Server annimmt', () => {
-    component.chooseTopic('app');
+    component.toggleTopic('app');
 
     component.submit(formWith());
 
@@ -93,26 +144,27 @@ describe('InquiryFormComponent', () => {
     expect(message.length).toBeGreaterThanOrEqual(10);
   });
 
-  it('nimmt Angaben eines anderen Themas nicht mit', () => {
-    component.chooseTopic('app');
+  it('nimmt Angaben eines abgewaehlten Themas nicht mit', () => {
+    component.toggleTopic('app');
     component.toggle('features', 'Zahlungen');
-    component.chooseTopic('web');
+    component.toggleTopic('app');
+    component.toggleTopic('web');
 
     component.submit(formWith());
 
     expect(sendContact.calls.mostRecent().args[0].message).not.toContain('Zahlungen');
   });
 
-  it('nennt das Kennenlernangebot als Anlass', () => {
+  it('nennt die Kennenlernaktion als Anlass', () => {
     component.startFromOffer();
 
     component.submit(formWith());
 
-    expect(sendContact.calls.mostRecent().args[0].message).toContain('Anlass: Kennenlernangebot');
+    expect(sendContact.calls.mostRecent().args[0].message).toContain('Anlass: Kennenlernaktion');
   });
 
   it('sendet bei Eingabefehlern nichts und sagt, woran es liegt', () => {
-    component.chooseTopic('web');
+    component.toggleTopic('web');
 
     component.submit(formWith({ email: { email: true } }));
 
@@ -121,7 +173,7 @@ describe('InquiryFormComponent', () => {
   });
 
   it('zeigt nach dem Senden das Danke und leert alles', () => {
-    component.chooseTopic('web');
+    component.toggleTopic('web');
     component.name = 'Max Muster';
 
     component.submit(formWith());
@@ -130,12 +182,12 @@ describe('InquiryFormComponent', () => {
     expect(component.step()).toBe(4);
     expect(query('.thanks')).not.toBeNull();
     expect(component.name).toBe('');
-    expect(component.topic()).toBeNull();
+    expect(component.selectedTopics()).toEqual([]);
   });
 
   it('behaelt bei einem Serverfehler die Eingaben und bleibt auf dem Schritt', () => {
     sendContact.and.returnValue(throwError(() => new HttpErrorResponse({ status: 500 })));
-    component.chooseTopic('web');
+    component.toggleTopic('web');
     component.step.set(3);
     component.name = 'Max Muster';
 

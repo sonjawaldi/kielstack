@@ -15,33 +15,23 @@
   @switch (step()) {
     @case (1) {
       <div class="fstep">
-        <h3 id="inquiry-heading" tabindex="-1">Worum geht es?</h3>
+        <h3 id="inquiry-heading" tabindex="-1">Worum geht es? <small>Mehrfachauswahl</small></h3>
 
         @if (fromOffer()) {
           <div class="carried">
-            <b>Übernommen aus dem Kennenlernangebot</b>
-            <div class="chips-mini"><span>Kostenlose Website</span></div>
-          </div>
-        }
-        @if (pains().length) {
-          <div class="carried">
-            <b>Übernommen aus „Kommt Ihnen das bekannt vor?“</b>
-            <div class="chips-mini">
-              @for (pain of pains(); track pain) {
-                <span>{{ pain }}</span>
-              }
-            </div>
+            <b>Übernommen aus der Kennenlernaktion</b>
+            <div class="chips-mini"><span>Kostenlose Website für Erstkunden</span></div>
           </div>
         }
 
-        <div class="opt-grid">
+        <div class="opt-grid" role="group" aria-labelledby="inquiry-heading">
           @for (option of topics; track option.id) {
             <button
               type="button"
               class="opt"
-              [class.on]="topic() === option.id"
-              [attr.aria-pressed]="topic() === option.id"
-              (click)="chooseTopic(option.id)"
+              [class.on]="hasTopic(option.id)"
+              [attr.aria-pressed]="hasTopic(option.id)"
+              (click)="toggleTopic(option.id)"
             >
               <b>{{ option.label }}</b>
               <small>{{ option.desc }}</small>
@@ -81,13 +71,13 @@
             @if (offerFits()) {
               <span class="fit">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
-                Das passt ins Kennenlernangebot.
+                Das passt zur Kennenlernaktion.
               </span>
             }
           </div>
         }
 
-        @if (topic() === 'redo') {
+        @if (hasTopic('redo')) {
           <div>
             <label for="current-site">Ihre aktuelle Website</label>
             <input
@@ -101,7 +91,7 @@
           </div>
         }
 
-        @if (topic() === 'app') {
+        @if (hasTopic('app')) {
           <div class="fgroup" role="group" aria-labelledby="features-label">
             <span class="flabel" id="features-label"
               >Was soll die Anwendung können? <small>Mehrfachauswahl</small></span
@@ -121,7 +111,7 @@
           </div>
         }
 
-        @if (topic() === 'auto') {
+        @if (hasTopic('auto')) {
           <div class="fgroup" role="group" aria-labelledby="tools-label">
             <span class="flabel" id="tools-label"
               >Womit arbeiten Sie heute? <small>Mehrfachauswahl</small></span

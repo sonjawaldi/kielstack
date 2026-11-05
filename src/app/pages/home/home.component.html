@@ -25,19 +25,71 @@
 
     <div class="hero-r">
       <app-workspace-card />
+      <a class="hero-sticker" routerLink="/angebot">
+        <strong>3×</strong>
+        <span>Website kostenlos</span>
+      </a>
     </div>
   </div>
 </section>
 
-<section class="sec" id="probleme" aria-labelledby="probleme-titel">
-  <div class="wrap stack tight">
-    <div class="head-row">
-      <div class="head">
-        <span class="eyebrow">Kommt Ihnen das bekannt vor?</span>
-        <h2 class="h2" id="probleme-titel">Wo im Alltag Zeit verloren geht.</h2>
+<section class="sec" id="angebot" aria-labelledby="angebot-titel">
+  <div class="wrap offer-wrap">
+    <div class="offer">
+      <div class="offer-l">
+        <span class="eyebrow">Kennenlernaktion</span>
+        <h2 class="h2" id="angebot-titel">Für meine ersten 3 Kunden erstelle ich die Website kostenlos.</h2>
+        <p>
+          Regulärer Wert ca. 1.000 €. Im Gegenzug darf ich Ihr Projekt als Referenz zeigen, und Sie
+          geben mir ein kurzes Feedback.
+        </p>
       </div>
-      <p class="copy">
-        Tippen Sie an, was bei Ihnen zutrifft – und sehen Sie direkt, wie ich es lösen würde.
+      <div class="offer-r">
+        <div class="offer-seats">
+          <span class="seats" aria-hidden="true">
+            @for (free of offerSeats; track $index) {
+              <i [class.free]="free"></i>
+            }
+          </span>
+          <span>Noch <strong>2 von 3</strong> Plätzen für Erstkunden frei</span>
+        </div>
+        <button type="button" class="btn btn-p" (click)="requestOfferAppointment()">Platz anfragen</button>
+      </div>
+      <div class="offer-small">
+        <h3>Das Kleingedruckte – ganz groß</h3>
+        <div class="offer-groups">
+          @for (group of offerGroups; track group.title) {
+            <div class="offer-group">
+              <h4>{{ group.title }}</h4>
+              <ul>
+                @for (item of group.items; track item.text) {
+                  <li>
+                    <svg [class]="item.tone" viewBox="0 0 24 24" aria-hidden="true">
+                      <path [attr.d]="item.icon"></path>
+                    </svg>
+                    {{ item.text }}
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="probleme" aria-labelledby="probleme-titel">
+  <div class="wrap stack tight">
+    <div class="head">
+      <span class="eyebrow">Kommt Ihnen das bekannt vor?</span>
+      <h2 class="h2" id="probleme-titel">Wo im Alltag Zeit verloren geht.</h2>
+      <p class="copy info-note">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M12 11v5M12 8h.01"></path>
+        </svg>
+        <span>Tippen Sie an, was bei Ihnen zutrifft – und sehen Sie direkt, wie ich es lösen würde.</span>
       </p>
     </div>
 
@@ -74,32 +126,30 @@
           </button>
         }
       </div>
-      <div class="pain-bar" aria-live="polite">
-        <span>
-          @switch (selectedPains().length) {
-            @case (0) {
-              Tippen Sie an, was bei Ihnen zutrifft – ich zeige Ihnen, wie ich es lösen würde.
-            }
-            @case (1) {
-              1 Punkt trifft bei Ihnen zu.
-            }
-            @default {
-              {{ selectedPains().length }} Punkte treffen bei Ihnen zu.
-            }
-          }
-        </span>
+      <!-- Die Huelle bleibt immer da: Screenreader sagen nur Aenderungen in einem
+           Bereich an, den sie schon kennen. -->
+      <div aria-live="polite">
         @if (selectedPains().length) {
-          <a class="btn btn-p" routerLink="/kontakt" (click)="contactMode.set('inquiry')">
-            In meine Anfrage übernehmen
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
-          </a>
+          <div class="pain-bar">
+            <span>
+              @if (selectedPains().length === 1) {
+                1 Punkt trifft bei Ihnen zu.
+              } @else {
+                {{ selectedPains().length }} Punkte treffen bei Ihnen zu.
+              }
+            </span>
+            <a class="btn btn-p" routerLink="/kontakt" (click)="contactMode.set('inquiry')">
+              In meine Anfrage übernehmen
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+            </a>
+          </div>
         }
       </div>
     </div>
   </div>
 </section>
 
-<section class="sec alt" id="leistungen" aria-labelledby="leistungen-titel">
+<section class="sec" id="leistungen" aria-labelledby="leistungen-titel">
   <div class="wrap stack">
     <div class="head-row">
       <div class="head">
@@ -121,42 +171,6 @@
           <p>{{ service.text }}</p>
         </article>
       }
-    </div>
-  </div>
-</section>
-
-<section class="sec" aria-labelledby="angebot-titel">
-  <div class="wrap offer-wrap">
-    <div class="offer">
-      <div class="offer-l">
-        <span class="eyebrow">Kennenlernangebot</span>
-        <h2 class="h2" id="angebot-titel">Die nächsten drei Websites baue ich kostenlos.</h2>
-        <p>
-          Modern, fürs Handy optimiert und für Google vorbereitet – damit Ihr Betrieb online gefunden
-          werden kann.
-        </p>
-      </div>
-      <div class="offer-r">
-        <span>Noch <strong>2 von 3</strong> Plätzen frei</span>
-        <button type="button" class="btn btn-p" (click)="requestOfferAppointment()">Platz anfragen</button>
-      </div>
-      <div class="offer-small">
-        <h3>Das Kleingedruckte – ganz groß</h3>
-        <ul>
-          @for (item of offerIncluded; track item) {
-            <li>
-              <svg class="yes" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
-              {{ item }}
-            </li>
-          }
-          @for (item of offerExcluded; track item) {
-            <li>
-              <svg class="no" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
-              {{ item }}
-            </li>
-          }
-        </ul>
-      </div>
     </div>
   </div>
 </section>
@@ -304,13 +318,19 @@
         </button>
       </div>
 
-      <!-- Nur versteckt statt entfernt: eine halb ausgefüllte Anfrage bleibt so erhalten. -->
-      <app-inquiry-form [pains]="painLabels()" [hidden]="contactMode() !== 'inquiry'" />
+      <div class="contact-panes">
+        <!-- Nur versteckt statt entfernt: eine halb ausgefüllte Anfrage bleibt so erhalten. -->
+        <app-inquiry-form
+          [pains]="painLabels()"
+          [painTopics]="painTopics()"
+          [hidden]="contactMode() !== 'inquiry'"
+        />
 
-      <!-- Erst beim Öffnen erzeugt, damit nicht jeder Seitenaufruf den Kalender abfragt. -->
-      @if (contactMode() === 'booking') {
-        <app-booking (switchToInquiry)="contactMode.set('inquiry')" />
-      }
+        <!-- Erst beim Öffnen erzeugt, damit nicht jeder Seitenaufruf den Kalender abfragt. -->
+        @if (contactMode() === 'booking') {
+          <app-booking (switchToInquiry)="contactMode.set('inquiry')" />
+        }
+      </div>
     </div>
   </div>
 </section>

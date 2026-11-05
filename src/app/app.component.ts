@@ -43,6 +43,12 @@ export class AppComponent {
     this.menuOpen.set(false);
   }
 
+  /** Nach einem Mausklick kein Fokusrahmen ums Logo; Enter (detail 0) behaelt den Fokus. */
+  onLogoClick(event: MouseEvent): void {
+    this.closeMenu();
+    if (event.detail > 0) (event.currentTarget as HTMLElement).blur();
+  }
+
   private applyTheme(dark: boolean): void {
     this.darkMode.set(dark);
     this.document.documentElement.classList.toggle('dark', dark);
