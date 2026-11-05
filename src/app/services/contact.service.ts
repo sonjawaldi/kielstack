@@ -54,7 +54,7 @@ export function describeFormError(error: HttpErrorResponse): FormErrorState {
 
   return {
     message:
-      'Ihre Anfrage konnte leider nicht gesendet werden. Schreiben Sie uns gern direkt an business@kielstack.de.',
+      'Ihre Anfrage konnte leider nicht gesendet werden. Schreiben Sie mir gern direkt an business@kielstack.de.',
     fieldErrors: {},
   };
 }

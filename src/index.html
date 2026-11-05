@@ -9,7 +9,21 @@
       name="description"
       content="Kielstack entwickelt individuelle Webanwendungen, automatisiert Geschäftsprozesse und begleitet digitale Produkte – persönlich aus Kiel."
     />
-    <meta name="theme-color" content="#07111f" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b1020" />
+    <script>
+      // Vor dem ersten Zeichnen setzen, sonst blitzt die Seite im falschen Modus auf.
+      // Die Logik danach liegt im AppComponent; der Schluessel muss gleich bleiben.
+      (function () {
+        var stored = null;
+        try {
+          stored = localStorage.getItem('kielstack-theme');
+        } catch (e) {}
+        if (stored === 'dark' || (stored !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     <meta property="og:title" content="Kielstack | Digitale Lösungen für Unternehmen" />
     <meta property="og:description" content="Software, die zu Ihrem Unternehmen passt." />
     <meta property="og:type" content="website" />
