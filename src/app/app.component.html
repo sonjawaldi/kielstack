@@ -1,227 +1,79 @@
 <a href="#main-content" class="skip-link">Zum Inhalt springen</a>
 
-<div class="min-h-screen overflow-hidden bg-white text-ink transition-colors dark:bg-ink dark:text-white">
-  <header class="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl dark:border-white/10 dark:bg-ink/85">
-    <nav class="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 pt-3 lg:px-10" aria-label="Hauptnavigation">
-      <a href="#home" class="flex items-center font-black tracking-tight" (click)="closeMenu()" aria-label="Kielstack Startseite">
-        <img src="assets/brand/kielstack-logo.png" alt="Kielstack" class="h-16 w-28 object-cover object-center" />
+<div class="site">
+  <header class="hdr">
+    <div class="wrap hdr-bar">
+      <a class="logo" routerLink="/" (click)="closeMenu()" aria-label="Kielstack – zur Startseite">
+        <img src="assets/brand/kielstack-logo.png" alt="" width="1024" height="1024" />
       </a>
-
-      <div class="hidden items-center gap-8 text-sm font-bold md:flex">
-        <a href="#leistungen" class="transition hover:text-electric">Leistungen</a>
-        <a href="#prozess" class="transition hover:text-electric">Zusammenarbeit</a>
-        <a href="#ueber-uns" class="transition hover:text-electric">Über Kielstack</a>
-        <a href="#kontakt" class="rounded-xl bg-gradient-to-r from-electric via-neon to-magenta px-5 py-3 text-white shadow-neon transition hover:-translate-y-0.5 hover:shadow-purple">Projekt anfragen</a>
-      </div>
-
-      <div class="flex items-center gap-2">
-        <button type="button" class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 dark:border-white/10" (click)="toggleTheme()" [attr.aria-label]="darkMode() ? 'Helles Design aktivieren' : 'Dunkles Design aktivieren'">
-          <span aria-hidden="true">{{ darkMode() ? '☀' : '◐' }}</span>
+      <div class="hdr-act">
+        <nav class="nav" aria-label="Hauptnavigation">
+          <a routerLink="/leistungen">Leistungen</a>
+          <a routerLink="/prozess">Zusammenarbeit</a>
+          <a routerLink="/ueber-mich">Über Kielstack</a>
+          <a class="btn btn-p" routerLink="/kontakt">Projekt anfragen</a>
+        </nav>
+        <button
+          type="button"
+          class="icon-btn"
+          (click)="toggleTheme()"
+          [attr.aria-label]="darkMode() ? 'Hellen Modus aktivieren' : 'Dunklen Modus aktivieren'"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            @if (darkMode()) {
+              <circle cx="12" cy="12" r="4"></circle>
+              <path
+                d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+              ></path>
+            } @else {
+              <path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path>
+            }
+          </svg>
         </button>
-        <button type="button" class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 md:hidden dark:border-white/10" (click)="menuOpen.set(!menuOpen())" aria-label="Menü öffnen" [attr.aria-expanded]="menuOpen()">
-          <span aria-hidden="true">{{ menuOpen() ? '×' : '☰' }}</span>
+        <button
+          type="button"
+          class="icon-btn burger"
+          (click)="menuOpen.set(!menuOpen())"
+          [attr.aria-label]="menuOpen() ? 'Menü schließen' : 'Menü öffnen'"
+          [attr.aria-expanded]="menuOpen()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            @if (menuOpen()) {
+              <path d="M6 6l12 12M18 6L6 18"></path>
+            } @else {
+              <path d="M4 7h16M4 12h16M4 17h16"></path>
+            }
+          </svg>
         </button>
       </div>
-    </nav>
+    </div>
     @if (menuOpen()) {
-      <div class="border-t border-slate-200 bg-white px-6 py-5 md:hidden dark:border-white/10 dark:bg-ink">
-        <div class="flex flex-col gap-4 font-bold">
-          <a href="#leistungen" (click)="closeMenu()">Leistungen</a>
-          <a href="#prozess" (click)="closeMenu()">Zusammenarbeit</a>
-          <a href="#ueber-uns" (click)="closeMenu()">Über Kielstack</a>
-          <a href="#kontakt" (click)="closeMenu()" class="text-electric">Projekt anfragen →</a>
-        </div>
-      </div>
+      <nav class="menu" aria-label="Mobile Navigation">
+        <a routerLink="/leistungen" (click)="closeMenu()">Leistungen</a>
+        <a routerLink="/prozess" (click)="closeMenu()">Zusammenarbeit</a>
+        <a routerLink="/ueber-mich" (click)="closeMenu()">Über Kielstack</a>
+        <a class="btn btn-p" routerLink="/kontakt" (click)="closeMenu()">Projekt anfragen</a>
+      </nav>
     }
   </header>
 
   <main id="main-content">
-    <section id="home" class="grid-bg relative flex min-h-screen items-center pt-24">
-      <div class="absolute -right-48 top-10 h-[34rem] w-[34rem] rounded-full bg-electric/20 blur-3xl"></div>
-      <div class="absolute left-[35%] top-[20%] h-80 w-80 rounded-full bg-magenta/10 blur-3xl"></div>
-      <div class="absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-neon/20 blur-3xl"></div>
-      <div class="relative mx-auto grid w-full max-w-7xl gap-14 px-6 py-20 lg:grid-cols-[1.15fr_.85fr] lg:px-10">
-        <div>
-          <p class="mb-7 inline-flex items-center gap-3 rounded-full border border-electric/30 bg-electric/10 px-4 py-2 text-xs font-black uppercase tracking-[.2em] text-blue-700 dark:text-blue-300">
-            <span class="h-2 w-2 rounded-full bg-electric shadow-[0_0_12px_#087cff]"></span> Softwareentwicklung aus Kiel
-          </p>
-          <h1 class="max-w-4xl text-5xl font-black leading-[1.02] tracking-[-.045em] sm:text-6xl lg:text-7xl">
-            Digitale Lösungen, die Ihr Business
-            <span class="neon-text">wirklich voranbringen.</span>
-          </h1>
-          <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl dark:text-slate-300">
-            Wir entwickeln moderne Webanwendungen, automatisieren wiederkehrende Abläufe und machen aus Ideen verlässliche digitale Produkte.
-          </p>
-          <div class="mt-10 flex flex-col gap-4 sm:flex-row">
-            <a href="#kontakt" class="group inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-electric via-neon to-magenta px-7 py-4 font-black text-white shadow-neon transition hover:-translate-y-1 hover:shadow-purple">
-              Unverbindlich anfragen <span class="ml-3 transition group-hover:translate-x-1">→</span>
-            </a>
-            <a href="#leistungen" class="inline-flex items-center justify-center rounded-2xl border border-slate-300 px-7 py-4 font-black transition hover:border-electric dark:border-blue-400/30 dark:hover:border-electric">Leistungen entdecken</a>
-          </div>
-          <div class="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm font-semibold text-slate-500 dark:text-slate-400">
-            <span>✓ Persönliche Begleitung</span><span>✓ Transparentes Vorgehen</span><span>✓ Sauber dokumentiert</span>
-          </div>
-        </div>
-
-        <div class="relative hidden items-center justify-center lg:flex" aria-hidden="true">
-          <div class="neon-panel relative w-full max-w-md rounded-[2rem] border border-blue-400/20 bg-white p-5 shadow-2xl dark:bg-white/[.04]">
-            <div class="mb-5 flex items-center justify-between">
-              <div class="flex gap-2"><i class="h-3 w-3 rounded-full bg-red-400"></i><i class="h-3 w-3 rounded-full bg-amber-400"></i><i class="h-3 w-3 rounded-full bg-emerald-400"></i></div>
-              <span class="text-xs font-bold text-slate-400">kielstack / workspace</span>
-            </div>
-            <div class="rounded-2xl bg-ink p-6 text-white">
-              <p class="text-xs font-bold uppercase tracking-widest text-blue-300">Ihr nächster Schritt</p>
-              <p class="mt-3 text-2xl font-black">Von komplex zu klar.</p>
-              <div class="mt-7 space-y-3">
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3"><b class="grid h-8 w-8 place-items-center rounded-lg bg-electric text-white">1</b><span>Bedarf verstehen</span></div>
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3"><b class="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-electric to-neon text-white">2</b><span>Lösung entwickeln</span></div>
-                <div class="flex items-center gap-3 rounded-xl bg-white/10 p-3"><b class="grid h-8 w-8 place-items-center rounded-lg bg-magenta text-white">3</b><span>Wirkung erzielen</span></div>
-              </div>
-            </div>
-            <div class="absolute -bottom-7 -left-10 rounded-2xl bg-gradient-to-r from-electric via-neon to-magenta px-6 py-4 font-black text-white shadow-purple">Moin. Läuft. ✓</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="leistungen" class="bg-slate-50 py-24 dark:bg-white/[.025]">
-      <div class="mx-auto max-w-7xl px-6 lg:px-10">
-        <p class="text-xs font-black uppercase tracking-[.22em] text-electric">Leistungen</p>
-        <div class="mt-4 grid gap-6 lg:grid-cols-2 lg:items-end">
-          <h2 class="text-4xl font-black tracking-tight sm:text-5xl">Technik mit klarem Geschäftsnutzen.</h2>
-          <p class="max-w-xl text-lg leading-relaxed text-slate-600 dark:text-slate-300">Passgenau entwickelt, verständlich erklärt und bereit, mit Ihrem Unternehmen mitzuwachsen.</p>
-        </div>
-        <div class="mt-14 grid gap-5 md:grid-cols-2">
-          <article class="neon-panel group rounded-3xl border border-slate-200 bg-white p-8 transition hover:-translate-y-1 hover:border-electric dark:border-blue-400/15 dark:bg-ink">
-            <span class="text-4xl text-electric">⌘</span><p class="mt-8 text-xs font-black uppercase tracking-widest text-electric">01 · Entwicklung</p>
-            <h3 class="mt-3 text-2xl font-black">Websites & Webanwendungen</h3>
-            <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">Schnelle Unternehmensseiten, Kundenportale und individuelle Anwendungen – responsive, barrierearm und wartbar.</p>
-          </article>
-          <article class="neon-panel group rounded-3xl border border-slate-200 bg-white p-8 transition hover:-translate-y-1 hover:border-blue-400 dark:border-blue-400/15 dark:bg-ink">
-            <span class="text-4xl">↻</span><p class="mt-8 text-xs font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400">02 · Effizienz</p>
-            <h3 class="mt-3 text-2xl font-black">Prozesse & Automatisierung</h3>
-            <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">Weniger Copy-and-paste, weniger Fehler: Wir verbinden Systeme und automatisieren wiederkehrende Arbeitsschritte.</p>
-          </article>
-          <article class="neon-panel group rounded-3xl border border-slate-200 bg-white p-8 transition hover:-translate-y-1 hover:border-neon dark:border-blue-400/15 dark:bg-ink">
-            <span class="text-4xl">◇</span><p class="mt-8 text-xs font-black uppercase tracking-widest text-violet-600 dark:text-violet-400">03 · Produkt</p>
-            <h3 class="mt-3 text-2xl font-black">Konzeption & Prototyping</h3>
-            <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">Aus einer Idee wird ein testbares Produkt: mit klaren Anforderungen, fokussiertem Prototyp und sinnvoller Roadmap.</p>
-          </article>
-          <article class="neon-panel group rounded-3xl border border-slate-200 bg-white p-8 transition hover:-translate-y-1 hover:border-purple-400 dark:border-blue-400/15 dark:bg-ink">
-            <span class="text-4xl text-purple-500">◉</span><p class="mt-8 text-xs font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">04 · Betrieb</p>
-            <h3 class="mt-3 text-2xl font-black">Weiterentwicklung & Support</h3>
-            <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">Nach dem Launch bleiben wir erreichbar – für Updates, neue Funktionen, Monitoring und technische Fragen.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="prozess" class="py-24">
-      <div class="mx-auto max-w-7xl px-6 lg:px-10">
-        <div class="grid gap-16 lg:grid-cols-[.8fr_1.2fr]">
-          <div>
-            <p class="text-xs font-black uppercase tracking-[.22em] text-electric">Zusammenarbeit</p>
-            <h2 class="mt-4 text-4xl font-black tracking-tight sm:text-5xl">Klarer Prozess.<br />Keine Blackbox.</h2>
-            <p class="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-300">Sie wissen jederzeit, was entsteht, warum wir etwas empfehlen und was als Nächstes passiert.</p>
-          </div>
-          <ol class="space-y-4">
-            <li class="neon-panel grid grid-cols-[auto_1fr] gap-5 rounded-3xl border border-slate-200 p-6 dark:border-blue-400/15"><b class="text-2xl text-electric">01</b><div><h3 class="text-xl font-black">Kennenlernen & verstehen</h3><p class="mt-2 text-slate-600 dark:text-slate-400">Wir klären Ziel, Nutzer, Rahmen und den echten Engpass.</p></div></li>
-            <li class="neon-panel grid grid-cols-[auto_1fr] gap-5 rounded-3xl border border-slate-200 p-6 dark:border-blue-400/15"><b class="text-2xl text-electric">02</b><div><h3 class="text-xl font-black">Planen & priorisieren</h3><p class="mt-2 text-slate-600 dark:text-slate-400">Sie erhalten eine verständliche Lösungsskizze, Aufwand und klare nächste Schritte.</p></div></li>
-            <li class="neon-panel grid grid-cols-[auto_1fr] gap-5 rounded-3xl border border-slate-200 p-6 dark:border-blue-400/15"><b class="text-2xl text-neon">03</b><div><h3 class="text-xl font-black">Entwickeln & testen</h3><p class="mt-2 text-slate-600 dark:text-slate-400">In kurzen Etappen entsteht nutzbare Software mit regelmäßigem Feedback.</p></div></li>
-            <li class="neon-panel grid grid-cols-[auto_1fr] gap-5 rounded-3xl border border-slate-200 p-6 dark:border-blue-400/15"><b class="text-2xl text-neon">04</b><div><h3 class="text-xl font-black">Starten & weiterdenken</h3><p class="mt-2 text-slate-600 dark:text-slate-400">Wir begleiten den Launch, dokumentieren sauber und entwickeln gezielt weiter.</p></div></li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <section id="ueber-uns" class="bg-ink py-24 text-white">
-      <div class="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-2 lg:px-10">
-        <div class="relative min-h-80 overflow-hidden rounded-[2rem] bg-gradient-to-br from-electric via-neon to-magenta p-8 text-white shadow-purple">
-          <div class="grid-bg absolute inset-0 opacity-30"></div>
-          <p class="relative text-6xl font-black">K.</p>
-          <blockquote class="relative mt-20 max-w-md text-3xl font-black leading-tight">„Gute Software fühlt sich nicht kompliziert an. Sie löst ein Problem.“</blockquote>
-        </div>
-        <div class="flex flex-col justify-center">
-          <p class="text-xs font-black uppercase tracking-[.22em] text-blue-300">Über Kielstack</p>
-          <h2 class="mt-4 text-4xl font-black tracking-tight sm:text-5xl">Norddeutsch klar.<br />Technisch stark.</h2>
-          <p class="mt-7 text-lg leading-relaxed text-slate-300">Kielstack steht für persönliche Softwareentwicklung aus Kiel. Hinter dem Stack steckt Sonja Waldenspuhl – Informatikerin und Entwicklerin mit einem Blick für zugängliche, verständliche digitale Lösungen.</p>
-          <p class="mt-4 leading-relaxed text-slate-400">Je nach Projekt arbeiten wir mit passenden Partnerinnen und Partnern zusammen. Ihr Kontakt bleibt dabei direkt, die Kommunikation verbindlich und das Ergebnis nachvollziehbar.</p>
-          <a href="https://sonjawaldenspuhl.de" target="_blank" rel="noopener noreferrer" class="mt-8 inline-flex w-fit font-black text-blue-300">Mehr über Sonja erfahren →</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="kontakt" class="py-24">
-      <div class="mx-auto max-w-5xl px-6 lg:px-10">
-        <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/[.035]">
-          <div class="grid lg:grid-cols-[.8fr_1.2fr]">
-            <div class="bg-gradient-to-br from-electric via-neon to-magenta p-8 text-white sm:p-10">
-              <p class="text-xs font-black uppercase tracking-[.22em]">Kontakt</p>
-              <h2 class="mt-4 text-4xl font-black tracking-tight">Was dürfen wir für Sie leichter machen?</h2>
-              <p class="mt-6 leading-relaxed">Erzählen Sie kurz von Ihrer Idee oder Herausforderung. Sie erhalten eine ehrliche erste Einschätzung.</p>
-              <a href="mailto:moin@kielstack.de" class="mt-10 block font-black">moin&#64;kielstack.de</a>
-              <p class="mt-2 text-sm">Kiel · Schleswig-Holstein</p>
-            </div>
-            <div class="p-8 sm:p-10">
-                <form (ngSubmit)="submitContact(kontaktForm)" #kontaktForm="ngForm" class="space-y-5">
-                  @if (sent()) {
-                    <p class="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300" role="status">
-                      Danke für Ihre Anfrage. Wir melden uns zeitnah bei Ihnen.
-                    </p>
-                  }
-                  @if (errorMessage()) {
-                    <p class="rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-800 dark:bg-red-500/10 dark:text-red-300" role="alert">
-                      {{ errorMessage() }}
-                    </p>
-                  }
-                  <div>
-                    <label for="name" class="mb-2 block text-sm font-bold">Name / Unternehmen</label>
-                    <input id="name" name="name" [(ngModel)]="name" required minlength="2" autocomplete="name" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" />
-                    @if (fieldErrors()['name']) {
-                      <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['name'] }}</p>
-                    }
-                  </div>
-                  <div>
-                    <label for="email" class="mb-2 block text-sm font-bold">E-Mail</label>
-                    <input id="email" name="email" type="email" [(ngModel)]="email" required email autocomplete="email" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white" />
-                    @if (fieldErrors()['email']) {
-                      <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['email'] }}</p>
-                    }
-                  </div>
-                  <div>
-                    <label for="message" class="mb-2 block text-sm font-bold">Worum geht es?</label>
-                    <textarea id="message" name="message" rows="5" [(ngModel)]="message" required minlength="10" class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-ink dark:border-white/15 dark:bg-ink dark:text-white"></textarea>
-                    @if (fieldErrors()['message']) {
-                      <p class="mt-1 text-xs font-bold text-red-600 dark:text-red-400">{{ fieldErrors()['message'] }}</p>
-                    }
-                  </div>
-                  <!-- Honeypot: für Menschen unsichtbar, Bots füllen ihn aus. -->
-                  <div class="hidden" aria-hidden="true">
-                    <label for="website">Website</label>
-                    <input id="website" name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off" />
-                  </div>
-                  <button type="submit" [disabled]="sending()" class="w-full rounded-xl bg-gradient-to-r from-electric via-neon to-magenta px-6 py-4 font-black text-white shadow-neon transition hover:-translate-y-0.5 hover:shadow-purple disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0">
-                    {{ sending() ? 'Wird gesendet …' : 'Anfrage senden →' }}
-                  </button>
-                  <p class="text-xs leading-relaxed text-slate-500">Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer Angaben zur Beantwortung der Anfrage einverstanden.</p>
-                </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <router-outlet />
   </main>
 
-  <footer class="border-t border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-black/20">
-    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10 md:flex-row md:items-center md:justify-between lg:px-10">
-      <div><img src="assets/brand/kielstack-logo.png" alt="Kielstack" class="h-20 w-36 object-cover object-center" /><p class="mt-2 text-sm text-slate-500">Digitale Lösungen für Unternehmen.</p></div>
-      <div class="flex flex-wrap gap-6 text-sm font-bold">
-        <a href="mailto:moin@kielstack.de">Kontakt</a>
+  <footer class="ftr">
+    <div class="wrap ftr-bar">
+      <div class="ftr-brand">
+        <img src="assets/brand/kielstack-logo.png" alt="Kielstack" width="1024" height="1024" />
+        <span>Kielstack – Sonja Waldenspuhl · Digitale Lösungen für Unternehmen</span>
+      </div>
+      <nav aria-label="Rechtliches">
+        <a routerLink="/kontakt">Kontakt</a>
         <a href="https://sonjawaldenspuhl.de/impressum">Impressum</a>
         <a href="https://sonjawaldenspuhl.de/datenschutz">Datenschutz</a>
         <a href="https://sonjawaldenspuhl.de/barrierefreiheit">Barrierefreiheit</a>
-      </div>
-      <p class="text-xs text-slate-500">© 2026 Kielstack</p>
+      </nav>
+      <span>© 2026 Kielstack</span>
     </div>
   </footer>
 </div>

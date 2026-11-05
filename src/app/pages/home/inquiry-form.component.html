@@ -1,0 +1,272 @@
+<div class="form">
+  @if (step() < 4) {
+    <div class="progress">
+      <div class="progress-text">
+        <span>Schritt {{ step() }} von 3</span><span>{{ stepName() }}</span>
+      </div>
+      <div class="progress-bar" aria-hidden="true">
+        @for (segment of segments; track segment) {
+          <i [class.on]="step() >= segment"></i>
+        }
+      </div>
+    </div>
+  }
+
+  @switch (step()) {
+    @case (1) {
+      <div class="fstep">
+        <h3 id="inquiry-heading" tabindex="-1">Worum geht es?</h3>
+
+        @if (fromOffer()) {
+          <div class="carried">
+            <b>Übernommen aus dem Kennenlernangebot</b>
+            <div class="chips-mini"><span>Kostenlose Website</span></div>
+          </div>
+        }
+        @if (pains().length) {
+          <div class="carried">
+            <b>Übernommen aus „Kommt Ihnen das bekannt vor?“</b>
+            <div class="chips-mini">
+              @for (pain of pains(); track pain) {
+                <span>{{ pain }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="opt-grid">
+          @for (option of topics; track option.id) {
+            <button
+              type="button"
+              class="opt"
+              [class.on]="topic() === option.id"
+              [attr.aria-pressed]="topic() === option.id"
+              (click)="chooseTopic(option.id)"
+            >
+              <b>{{ option.label }}</b>
+              <small>{{ option.desc }}</small>
+            </button>
+          }
+        </div>
+
+        @if (topicError()) {
+          <p class="err" role="alert">Bitte wählen Sie zuerst ein Thema aus.</p>
+        }
+
+        <div class="fnav end">
+          <button type="button" class="btn btn-p" (click)="next()">Weiter</button>
+        </div>
+      </div>
+    }
+
+    @case (2) {
+      <div class="fstep">
+        <h3 id="inquiry-heading" tabindex="-1">Ein paar Details</h3>
+
+        @if (isSite()) {
+          <div class="fgroup" role="group" aria-labelledby="pages-label">
+            <span class="flabel" id="pages-label">Wie viele Seiten ungefähr?</span>
+            <div class="chips">
+              @for (option of pageOptions; track option) {
+                <button
+                  type="button"
+                  [class.on]="pages() === option"
+                  [attr.aria-pressed]="pages() === option"
+                  (click)="pages.set(option)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+            @if (offerFits()) {
+              <span class="fit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+                Das passt ins Kennenlernangebot.
+              </span>
+            }
+          </div>
+        }
+
+        @if (topic() === 'redo') {
+          <div>
+            <label for="current-site">Ihre aktuelle Website</label>
+            <input
+              id="current-site"
+              name="currentSite"
+              type="url"
+              placeholder="www.ihre-firma.de"
+              [(ngModel)]="currentSite"
+              [ngModelOptions]="{ standalone: true }"
+            />
+          </div>
+        }
+
+        @if (topic() === 'app') {
+          <div class="fgroup" role="group" aria-labelledby="features-label">
+            <span class="flabel" id="features-label"
+              >Was soll die Anwendung können? <small>Mehrfachauswahl</small></span
+            >
+            <div class="chips">
+              @for (option of featureOptions; track option) {
+                <button
+                  type="button"
+                  [class.on]="features().includes(option)"
+                  [attr.aria-pressed]="features().includes(option)"
+                  (click)="toggle('features', option)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (topic() === 'auto') {
+          <div class="fgroup" role="group" aria-labelledby="tools-label">
+            <span class="flabel" id="tools-label"
+              >Womit arbeiten Sie heute? <small>Mehrfachauswahl</small></span
+            >
+            <div class="chips">
+              @for (option of toolOptions; track option) {
+                <button
+                  type="button"
+                  [class.on]="tools().includes(option)"
+                  [attr.aria-pressed]="tools().includes(option)"
+                  (click)="toggle('tools', option)"
+                >
+                  {{ option }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="fgroup" role="group" aria-labelledby="time-label">
+          <span class="flabel" id="time-label">Wann soll es losgehen?</span>
+          <div class="chips">
+            @for (option of timeOptions; track option) {
+              <button
+                type="button"
+                [class.on]="time() === option"
+                [attr.aria-pressed]="time() === option"
+                (click)="time.set(option)"
+              >
+                {{ option }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="fnav">
+          <button type="button" class="btn btn-s" (click)="back()">Zurück</button>
+          <button type="button" class="btn btn-p" (click)="next()">Weiter</button>
+        </div>
+      </div>
+    }
+
+    @case (3) {
+      <form
+        class="fstep"
+        aria-label="Projektanfrage"
+        novalidate
+        #kontaktForm="ngForm"
+        (ngSubmit)="submit(kontaktForm)"
+      >
+        <h3 id="inquiry-heading" tabindex="-1">Wie erreiche ich Sie?</h3>
+
+        <div class="carried text">
+          <span><b>Ihre Auswahl:</b> {{ summary() }}</span>
+          @if (pains().length) {
+            <span><b>Ihre Themen:</b> {{ pains().join(', ') }}</span>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <p class="notice bad" role="alert">{{ errorMessage() }}</p>
+        }
+
+        <div class="two">
+          <div>
+            <label for="name">Name / Unternehmen</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              required
+              minlength="2"
+              [(ngModel)]="name"
+              [attr.aria-invalid]="!!fieldErrors()['name']"
+              [attr.aria-describedby]="fieldErrors()['name'] ? 'name-error' : null"
+            />
+            @if (fieldErrors()['name']) {
+              <p class="err" id="name-error">{{ fieldErrors()['name'] }}</p>
+            }
+          </div>
+          <div>
+            <label for="email">E-Mail</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              email
+              [(ngModel)]="email"
+              [attr.aria-invalid]="!!fieldErrors()['email']"
+              [attr.aria-describedby]="fieldErrors()['email'] ? 'email-error' : null"
+            />
+            @if (fieldErrors()['email']) {
+              <p class="err" id="email-error">{{ fieldErrors()['email'] }}</p>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label for="note">Noch etwas, das ich wissen sollte? <small>optional</small></label>
+          <textarea id="note" name="note" rows="3" maxlength="4500" [(ngModel)]="note"></textarea>
+          @if (fieldErrors()['message']) {
+            <p class="err">{{ fieldErrors()['message'] }}</p>
+          }
+        </div>
+
+        <!-- Honeypot: für Menschen unsichtbar, Bots füllen ihn aus. -->
+        <div class="hp" aria-hidden="true">
+          <label for="website">Website</label>
+          <input id="website" name="website" [(ngModel)]="website" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <p class="legal-note">
+          Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer Angaben zur Beantwortung der
+          Anfrage einverstanden.
+          <a href="https://sonjawaldenspuhl.de/datenschutz">Datenschutz</a>
+        </p>
+
+        <div class="fnav">
+          <button type="button" class="btn btn-s" (click)="back()">Zurück</button>
+          <button type="submit" class="btn btn-p" [disabled]="sending()">
+            {{ sending() ? 'Wird gesendet …' : 'Anfrage senden' }}
+          </button>
+        </div>
+      </form>
+    }
+
+    @default {
+      <div class="fstep thanks" role="status">
+        <span class="thanks-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+        </span>
+        <h3 id="inquiry-heading" tabindex="-1">Danke – Ihre Anfrage ist da.</h3>
+        <p>
+          Ich schaue sie mir persönlich an und melde mich mit einer ehrlichen ersten Einschätzung bei
+          Ihnen. Moin und bis bald!
+        </p>
+        <div class="thanks-by">
+          <img src="assets/sonja-waldenspuhl-avatar.jpg" alt="" width="160" height="160" />
+          <b>Sonja</b>
+        </div>
+        <button type="button" class="linkbtn" (click)="restart()">Neue Anfrage starten</button>
+      </div>
+    }
+  }
+</div>

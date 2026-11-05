@@ -1,0 +1,289 @@
+<section id="home">
+  <div class="wrap hero">
+    <div class="hero-l">
+      <span class="kicker"><i aria-hidden="true"></i>Softwareentwicklung aus Kiel</span>
+      <h1 class="h1">Digitale Lösungen, die Ihr Business <span>voranbringen.</span></h1>
+      <p class="lead">
+        Ich bin Sonja und entwickle moderne Websites und Webanwendungen, automatisiere wiederkehrende
+        Abläufe und mache aus Ideen verlässliche digitale Produkte – persönlich und verständlich.
+      </p>
+      <div class="ctas">
+        <a class="btn btn-p" routerLink="/kontakt">
+          Unverbindlich anfragen
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+        </a>
+        <a class="btn btn-s" routerLink="/leistungen">Leistungen ansehen</a>
+      </div>
+      <ul class="trust desktop-only">
+        @for (item of trust; track item) {
+          <li>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>{{ item }}
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="hero-r">
+      <app-workspace-card />
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="probleme" aria-labelledby="probleme-titel">
+  <div class="wrap stack tight">
+    <div class="head-row">
+      <div class="head">
+        <span class="eyebrow">Kommt Ihnen das bekannt vor?</span>
+        <h2 class="h2" id="probleme-titel">Wo im Alltag Zeit verloren geht.</h2>
+      </div>
+      <p class="copy">
+        Tippen Sie an, was bei Ihnen zutrifft – und sehen Sie direkt, wie ich es lösen würde.
+      </p>
+    </div>
+
+    <div class="pains">
+      <div class="pain-grid">
+        @for (problem of problems; track problem.id) {
+          @let on = selectedPains().includes(problem.id);
+          <button
+            type="button"
+            class="pain"
+            [class.on]="on"
+            [attr.aria-pressed]="on"
+            (click)="togglePain(problem.id)"
+          >
+            <span class="pain-top">
+              <span class="pain-quote">„{{ problem.quote }}“</span>
+              <span class="pain-box" aria-hidden="true">
+                @if (on) {
+                  <svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"></path></svg>
+                }
+              </span>
+            </span>
+            <span class="pain-text">{{ problem.text }}</span>
+            @if (on) {
+              <span class="pain-solution">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"></path>
+                </svg>
+                {{ problem.solution }}
+              </span>
+            } @else {
+              <span class="pain-hint">Trifft bei uns zu</span>
+            }
+          </button>
+        }
+      </div>
+      <div class="pain-bar" aria-live="polite">
+        <span>
+          @switch (selectedPains().length) {
+            @case (0) {
+              Tippen Sie an, was bei Ihnen zutrifft – ich zeige Ihnen, wie ich es lösen würde.
+            }
+            @case (1) {
+              1 Punkt trifft bei Ihnen zu.
+            }
+            @default {
+              {{ selectedPains().length }} Punkte treffen bei Ihnen zu.
+            }
+          }
+        </span>
+        @if (selectedPains().length) {
+          <a class="btn btn-p" routerLink="/kontakt">
+            In meine Anfrage übernehmen
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="leistungen" aria-labelledby="leistungen-titel">
+  <div class="wrap stack">
+    <div class="head-row">
+      <div class="head">
+        <span class="eyebrow">Leistungen</span>
+        <h2 class="h2" id="leistungen-titel">Technik mit klarem Geschäftsnutzen.</h2>
+      </div>
+      <p class="copy desktop-only">
+        Passgenau entwickelt, verständlich erklärt und bereit, mit Ihrem Unternehmen mitzuwachsen.
+      </p>
+    </div>
+    <div class="cards">
+      @for (service of services; track service.label) {
+        <article class="card">
+          <span class="card-icon desktop-only">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="service.icon"></path></svg>
+          </span>
+          <span class="card-label">{{ service.label }}</span>
+          <h3>{{ service.title }}</h3>
+          <p>{{ service.text }}</p>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="sec" aria-labelledby="angebot-titel">
+  <div class="wrap offer-wrap">
+    <div class="offer">
+      <div class="offer-l">
+        <span class="eyebrow">Kennenlernangebot</span>
+        <h2 class="h2" id="angebot-titel">Die nächsten drei Websites baue ich kostenlos.</h2>
+        <p>
+          Modern, fürs Handy optimiert und für Google vorbereitet – damit Ihr Betrieb online gefunden
+          werden kann.
+        </p>
+      </div>
+      <div class="offer-r">
+        <span>Noch <strong>2 von 3</strong> Plätzen frei</span>
+        <button type="button" class="btn btn-p" (click)="requestOfferAppointment()">Platz anfragen</button>
+      </div>
+      <div class="offer-small">
+        <h3>Das Kleingedruckte – ganz groß</h3>
+        <ul>
+          @for (item of offerIncluded; track item) {
+            <li>
+              <svg class="yes" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+              {{ item }}
+            </li>
+          }
+          @for (item of offerExcluded; track item) {
+            <li>
+              <svg class="no" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              {{ item }}
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="prozess" aria-labelledby="prozess-titel">
+  <div class="wrap stack">
+    <div class="head">
+      <span class="eyebrow">Zusammenarbeit</span>
+      <h2 class="h2" id="prozess-titel">Klarer Prozess. Keine Blackbox.</h2>
+      <p class="copy desktop-only">
+        Sie wissen jederzeit, was entsteht, warum ich etwas empfehle und was als Nächstes passiert.
+      </p>
+    </div>
+    <ol class="steps">
+      <li>
+        <span class="no">01</span>
+        <h3>Kennenlernen &amp; verstehen</h3>
+        <p>Wir klären Ziel, Nutzer, Rahmen und den echten Engpass.</p>
+      </li>
+      <li>
+        <span class="no">02</span>
+        <h3>Planen &amp; priorisieren</h3>
+        <p>Sie erhalten eine verständliche Lösungsskizze, Aufwand und klare nächste Schritte.</p>
+      </li>
+      <li>
+        <span class="no">03</span>
+        <h3>Entwickeln &amp; testen</h3>
+        <p>In kurzen Etappen entsteht nutzbare Software mit regelmäßigem Feedback.</p>
+      </li>
+      <li>
+        <span class="no">04</span>
+        <h3>Starten &amp; weiterdenken</h3>
+        <p>Ich begleite den Launch, dokumentiere sauber und entwickle gezielt weiter.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="ueber-mich" aria-labelledby="ueber-titel">
+  <div class="wrap about">
+    <div class="about-photo">
+      <img
+        src="assets/sonja-waldenspuhl.jpg"
+        alt="Sonja Waldenspuhl lächelnd im Mantel am Ostseestrand"
+        width="960"
+        height="1200"
+        loading="lazy"
+      />
+    </div>
+    <div class="about-text">
+      <span class="eyebrow">Über Kielstack</span>
+      <h2 class="h2" id="ueber-titel">Norddeutsch klar. Technisch stark.</h2>
+      <p class="copy">
+        Hinter Kielstack stehe ich, Sonja Waldenspuhl – Informatikerin und Entwicklerin aus Kiel, mit
+        einem Blick für zugängliche, verständliche digitale Lösungen.
+      </p>
+      <p class="copy">
+        Je nach Projekt arbeite ich mit passenden Partnerinnen und Partnern zusammen. Ihr Kontakt
+        bleibt dabei direkt, die Kommunikation verbindlich und das Ergebnis nachvollziehbar.
+      </p>
+      <blockquote>„Gute Software fühlt sich nicht kompliziert an. Sie löst ein Problem.“</blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="sec alt" id="faq" aria-labelledby="faq-titel">
+  <div class="wrap faq-layout">
+    <div class="faq-l">
+      <span class="eyebrow">Gut zu wissen</span>
+      <h2 class="h2" id="faq-titel">Häufige Fragen</h2>
+      <p class="copy desktop-only">
+        Ihre Frage ist nicht dabei? <a routerLink="/kontakt">Schreiben Sie mir einfach.</a>
+      </p>
+    </div>
+    <div class="faq">
+      @for (item of faqs; track item.question; let i = $index) {
+        <div class="qa">
+          <h3>
+            <button
+              type="button"
+              [id]="'faq-q-' + i"
+              [attr.aria-expanded]="openFaq() === i"
+              [attr.aria-controls]="'faq-a-' + i"
+              (click)="toggleFaq(i)"
+            >
+              <span>{{ item.question }}</span>
+              <i aria-hidden="true" [class.on]="openFaq() === i">{{ openFaq() === i ? '−' : '+' }}</i>
+            </button>
+          </h3>
+          @if (openFaq() === i) {
+            <p [id]="'faq-a-' + i" role="region" [attr.aria-labelledby]="'faq-q-' + i">
+              {{ item.answer }}
+            </p>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="kontakt" aria-labelledby="kontakt-titel">
+  <div class="wrap contact">
+    <div class="contact-l">
+      <span class="eyebrow">Kontakt</span>
+      <h2 class="h2" id="kontakt-titel">Was darf ich für Sie leichter machen?</h2>
+      <p class="copy desktop-only">
+        Erzählen Sie kurz von Ihrer Idee oder Herausforderung. Sie erhalten eine ehrliche erste
+        Einschätzung.
+      </p>
+      <div class="contact-list">
+        <a href="mailto:business&#64;kielstack.de">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+            <path d="M3 7l9 6 9-6"></path>
+          </svg>
+          business&#64;kielstack.de
+        </a>
+        <span class="desktop-only">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"></path>
+            <circle cx="12" cy="9" r="2.5"></circle>
+          </svg>
+          Kiel · Schleswig-Holstein
+        </span>
+      </div>
+    </div>
+
+    <app-inquiry-form [pains]="painLabels()" />
+  </div>
+</section>
