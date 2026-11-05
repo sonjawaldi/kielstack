@@ -988,20 +988,12 @@ body {
 }
 
 /* Leistungen */
-.head-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 24px;
+#leistungen .head {
+  max-width: none;
 }
 
-.head-row .head {
-  max-width: 620px;
-}
-
-.head-row .copy {
-  max-width: 420px;
+#leistungen .head .copy {
+  max-width: 640px;
 }
 
 .cards {
