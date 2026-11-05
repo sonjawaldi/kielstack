@@ -89,7 +89,7 @@
           }
         </span>
         @if (selectedPains().length) {
-          <a class="btn btn-p" routerLink="/kontakt">
+          <a class="btn btn-p" routerLink="/kontakt" (click)="contactMode.set('inquiry')">
             In meine Anfrage übernehmen
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
           </a>
@@ -284,6 +284,33 @@
       </div>
     </div>
 
-    <app-inquiry-form [pains]="painLabels()" />
+    <div class="contact-r">
+      <div class="contact-mode" role="group" aria-label="Art der Kontaktaufnahme">
+        <button
+          type="button"
+          [class.on]="contactMode() === 'inquiry'"
+          [attr.aria-pressed]="contactMode() === 'inquiry'"
+          (click)="contactMode.set('inquiry')"
+        >
+          Projekt beschreiben
+        </button>
+        <button
+          type="button"
+          [class.on]="contactMode() === 'booking'"
+          [attr.aria-pressed]="contactMode() === 'booking'"
+          (click)="contactMode.set('booking')"
+        >
+          Direkt Termin anfragen
+        </button>
+      </div>
+
+      <!-- Nur versteckt statt entfernt: eine halb ausgefüllte Anfrage bleibt so erhalten. -->
+      <app-inquiry-form [pains]="painLabels()" [hidden]="contactMode() !== 'inquiry'" />
+
+      <!-- Erst beim Öffnen erzeugt, damit nicht jeder Seitenaufruf den Kalender abfragt. -->
+      @if (contactMode() === 'booking') {
+        <app-booking (switchToInquiry)="contactMode.set('inquiry')" />
+      }
+    </div>
   </div>
 </section>

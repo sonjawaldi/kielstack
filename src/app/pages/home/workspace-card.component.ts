@@ -6,10 +6,34 @@ import { Component, Inject, OnDestroy, OnInit, signal } from '@angular/core';
   selector: 'app-workspace-card',
   standalone: true,
   template: `
-    <div class="panel">
+    <div
+      class="panel"
+      (mouseenter)="held = true"
+      (mouseleave)="held = false"
+      (focusin)="held = true"
+      (focusout)="held = false"
+    >
       <div class="panel-top">
         <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        <span>kielstack / workspace</span>
+        <div class="panel-title">
+          <span>kielstack / workspace</span>
+          <button
+            type="button"
+            class="ws-toggle"
+            [attr.aria-label]="
+              cycling() ? 'Automatischen Wechsel anhalten' : 'Automatischen Wechsel starten'
+            "
+            (click)="toggleCycling()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              @if (cycling()) {
+                <path d="M9 6v12M15 6v12"></path>
+              } @else {
+                <path d="M8 5l11 7-11 7z"></path>
+              }
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="panel-body">
         <div class="panel-head">
@@ -32,7 +56,9 @@ import { Component, Inject, OnDestroy, OnInit, signal } from '@angular/core';
           }
         </div>
 
-        <div class="ws-preview" aria-live="polite">
+        <!-- Nur ansagen, was jemand selbst gewaehlt hat: der automatische Wechsel
+             wuerde Screenreader sonst alle paar Sekunden unterbrechen. -->
+        <div class="ws-preview" [attr.aria-live]="cycling() ? 'off' : 'polite'">
           @switch (step()) {
             @case (0) {
               <div class="ws-in ws-notes">
@@ -97,6 +123,10 @@ import { Component, Inject, OnDestroy, OnInit, signal } from '@angular/core';
 export class WorkspaceCardComponent implements OnInit, OnDestroy {
   readonly steps = ['Bedarf verstehen', 'Lösung entwickeln', 'Wirkung erzielen'];
   readonly step = signal(0);
+  readonly cycling = signal(false);
+
+  /** Maus oder Tastaturfokus auf der Karte: solange wird gelesen, nicht gewechselt. */
+  held = false;
 
   private timer: ReturnType<typeof setInterval> | undefined;
 
@@ -106,9 +136,7 @@ export class WorkspaceCardComponent implements OnInit, OnDestroy {
     const reduceMotion = this.document.defaultView?.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    if (reduceMotion) return;
-
-    this.timer = setInterval(() => this.step.update((step) => (step + 1) % this.steps.length), 4000);
+    if (!reduceMotion) this.startCycling();
   }
 
   ngOnDestroy(): void {
@@ -121,7 +149,23 @@ export class WorkspaceCardComponent implements OnInit, OnDestroy {
     this.step.set(index);
   }
 
+  toggleCycling(): void {
+    if (this.cycling()) {
+      this.stopCycling();
+    } else {
+      this.startCycling();
+    }
+  }
+
+  private startCycling(): void {
+    this.cycling.set(true);
+    this.timer = setInterval(() => {
+      if (!this.held) this.step.update((step) => (step + 1) % this.steps.length);
+    }, 4000);
+  }
+
   private stopCycling(): void {
+    this.cycling.set(false);
     clearInterval(this.timer);
   }
 }

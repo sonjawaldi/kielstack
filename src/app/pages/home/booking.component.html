@@ -1,0 +1,179 @@
+<div class="form">
+  @switch (state()) {
+    @case ('loading') {
+      <div class="fstep" role="status">
+        <h3 id="booking-heading" tabindex="-1">Termin anfragen</h3>
+        <p class="hint">Freie Termine werden geladen …</p>
+      </div>
+    }
+
+    @case ('failed') {
+      <div class="fstep">
+        <h3 id="booking-heading" tabindex="-1">Termin anfragen</h3>
+        <p class="notice bad" role="alert">Die freien Termine lassen sich gerade nicht laden.</p>
+        <div class="fnav">
+          <button type="button" class="btn btn-s" (click)="load()">Erneut versuchen</button>
+          <button type="button" class="btn btn-p" (click)="switchToInquiry.emit()">
+            Anfrage schreiben
+          </button>
+        </div>
+      </div>
+    }
+
+    @case ('sent') {
+      <div class="fstep thanks" role="status">
+        <span class="thanks-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+        </span>
+        <h3 id="booking-heading" tabindex="-1">Danke – Ihre Terminanfrage ist da.</h3>
+        <p>
+          Ihr Wunschtermin: <b>{{ selectedLabel() }}</b
+          >. Der Termin steht, sobald ich ihn Ihnen per E-Mail bestätigt habe. Moin und bis bald!
+        </p>
+        <div class="thanks-by">
+          <img src="assets/sonja-waldenspuhl-avatar.jpg" alt="" width="160" height="160" />
+          <b>Sonja</b>
+        </div>
+        <button type="button" class="linkbtn" (click)="restart()">Weiteren Termin anfragen</button>
+      </div>
+    }
+
+    @default {
+      <form
+        class="fstep"
+        aria-label="Terminanfrage"
+        novalidate
+        #bookingForm="ngForm"
+        (ngSubmit)="submit(bookingForm)"
+      >
+        <h3 id="booking-heading" tabindex="-1">Wann passt es Ihnen?</h3>
+        <p class="hint">
+          {{ slotMinutes() }} Minuten Erstgespräch, unverbindlich. Alle Zeiten in deutscher Zeit.
+        </p>
+
+        @if (errorMessage()) {
+          <p class="notice bad" role="alert">{{ errorMessage() }}</p>
+        }
+
+        @if (days().length === 0) {
+          <p class="notice">Gerade ist online kein Termin frei.</p>
+          <div class="fnav end">
+            <button type="button" class="btn btn-p" (click)="switchToInquiry.emit()">
+              Anfrage schreiben
+            </button>
+          </div>
+        } @else {
+          <div class="fgroup" role="group" aria-labelledby="booking-day-label">
+            <span class="flabel" id="booking-day-label">Tag</span>
+            <div class="chips">
+              @for (day of days(); track day.key) {
+                <button
+                  type="button"
+                  [class.on]="dayKey() === day.key"
+                  [attr.aria-pressed]="dayKey() === day.key"
+                  (click)="chooseDay(day.key)"
+                >
+                  {{ day.label }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="fgroup" role="group" aria-labelledby="booking-time-label">
+            <span class="flabel" id="booking-time-label">Uhrzeit</span>
+            <div class="chips">
+              @for (slot of selectedDay()?.slots; track slot.start) {
+                <button
+                  type="button"
+                  [class.on]="start() === slot.start"
+                  [attr.aria-pressed]="start() === slot.start"
+                  (click)="start.set(slot.start)"
+                >
+                  {{ slot.time }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (start()) {
+            <div class="carried text">
+              <span><b>Ihr Wunschtermin:</b> {{ selectedLabel() }}</span>
+            </div>
+
+            <div class="two">
+              <div>
+                <label for="booking-name">Name / Unternehmen</label>
+                <input
+                  id="booking-name"
+                  name="name"
+                  type="text"
+                  autocomplete="name"
+                  required
+                  minlength="2"
+                  [(ngModel)]="name"
+                  [attr.aria-invalid]="!!fieldErrors()['name']"
+                  [attr.aria-describedby]="fieldErrors()['name'] ? 'booking-name-error' : null"
+                />
+                @if (fieldErrors()['name']) {
+                  <p class="err" id="booking-name-error">{{ fieldErrors()['name'] }}</p>
+                }
+              </div>
+              <div>
+                <label for="booking-email">E-Mail</label>
+                <input
+                  id="booking-email"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  email
+                  [(ngModel)]="email"
+                  [attr.aria-invalid]="!!fieldErrors()['email']"
+                  [attr.aria-describedby]="fieldErrors()['email'] ? 'booking-email-error' : null"
+                />
+                @if (fieldErrors()['email']) {
+                  <p class="err" id="booking-email-error">{{ fieldErrors()['email'] }}</p>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label for="booking-note">Worum geht es? <small>optional</small></label>
+              <textarea
+                id="booking-note"
+                name="note"
+                rows="3"
+                maxlength="4500"
+                [(ngModel)]="note"
+              ></textarea>
+            </div>
+
+            <!-- Honeypot: für Menschen unsichtbar, Bots füllen ihn aus. -->
+            <div class="hp" aria-hidden="true">
+              <label for="booking-website">Website</label>
+              <input
+                id="booking-website"
+                name="website"
+                [(ngModel)]="website"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
+            <p class="legal-note">
+              Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer Angaben zur Beantwortung
+              der Anfrage einverstanden.
+              <a href="https://sonjawaldenspuhl.de/datenschutz">Datenschutz</a>
+            </p>
+
+            <div class="fnav end">
+              <button type="submit" class="btn btn-p" [disabled]="sending()">
+                {{ sending() ? 'Wird gesendet …' : 'Termin anfragen' }}
+              </button>
+            </div>
+          }
+        }
+      </form>
+    }
+  }
+</div>

@@ -39,4 +39,50 @@ describe('WorkspaceCardComponent', () => {
 
     expect(fixture.componentInstance.step()).toBe(0);
   }));
+
+  it('laesst sich ueber den Knopf anhalten und wieder starten', fakeAsync(() => {
+    const fixture = create(false);
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.ws-toggle');
+    expect(button.getAttribute('aria-label')).toContain('anhalten');
+
+    button.click();
+    fixture.detectChanges();
+    tick(8000);
+    expect(fixture.componentInstance.step()).toBe(0);
+    expect(button.getAttribute('aria-label')).toContain('starten');
+
+    button.click();
+    tick(4000);
+    expect(fixture.componentInstance.step()).toBe(1);
+
+    fixture.destroy();
+  }));
+
+  it('wechselt nicht, solange Maus oder Fokus auf der Karte liegen', fakeAsync(() => {
+    const fixture = create(false);
+    const panel: HTMLElement = fixture.nativeElement.querySelector('.panel');
+
+    panel.dispatchEvent(new FocusEvent('focusin'));
+    tick(8000);
+    expect(fixture.componentInstance.step()).toBe(0);
+
+    panel.dispatchEvent(new FocusEvent('focusout'));
+    tick(4000);
+    expect(fixture.componentInstance.step()).toBe(1);
+
+    fixture.destroy();
+  }));
+
+  it('sagt nur selbst gewaehlte Schritte an, nicht den automatischen Wechsel', fakeAsync(() => {
+    const fixture = create(false);
+    const preview: HTMLElement = fixture.nativeElement.querySelector('.ws-preview');
+    expect(preview.getAttribute('aria-live')).toBe('off');
+
+    fixture.nativeElement.querySelectorAll('.ws-steps button')[1].click();
+    fixture.detectChanges();
+
+    expect(preview.getAttribute('aria-live')).toBe('polite');
+
+    fixture.destroy();
+  }));
 });

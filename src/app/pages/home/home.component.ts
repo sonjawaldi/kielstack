@@ -12,6 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
+import { BookingComponent } from './booking.component';
 import { InquiryFormComponent } from './inquiry-form.component';
 import { WorkspaceCardComponent } from './workspace-card.component';
 
@@ -77,7 +78,7 @@ const FAQS = [
   {
     question: 'Was kostet eine Website bei Kielstack?',
     answer:
-      'Im Kennenlernangebot ist die Erstellung kostenlos – Sie tragen nur Domain und Hosting. Für alle anderen Projekte bekommen Sie nach dem Erstgespräch ein transparentes Angebot, bevor irgendetwas losgeht.',
+      'Im Kennenlernangebot ist die Erstellung kostenlos – Sie tragen nur Domain und Hosting oder übergeben mir die Verantwortung dafür. Für alle anderen Projekte bekommen Sie nach dem Erstgespräch ein transparentes Angebot, bevor irgendetwas losgeht.',
   },
   {
     question: 'Wie lange dauert ein Projekt?',
@@ -94,7 +95,7 @@ const FAQS = [
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, WorkspaceCardComponent, InquiryFormComponent],
+  imports: [RouterLink, WorkspaceCardComponent, InquiryFormComponent, BookingComponent],
   templateUrl: './home.component.html',
 })
 export class HomeComponent implements OnInit {
@@ -110,7 +111,7 @@ export class HomeComponent implements OnInit {
   readonly offerIncluded = [
     'Einmalige, kostenlose Erstellung als Kennenlernaktion',
     'Bis zu 5 Seiten, modern und fürs Handy optimiert',
-    'Domain und Hosting zahlen Sie selbst',
+    'Domain und Hosting tragen Sie selbst oder übergeben mir die Verantwortung dafür',
     'Ein dezenter Hinweis „Kielstack – Sonja Waldenspuhl“ im Footer',
     'Erster Entwurf und zwei Korrekturschleifen, weitere Änderungen für 65 €/h',
     'Texte und Bilder liefern Sie innerhalb von 4 Wochen nach dem Startgespräch',
@@ -128,6 +129,7 @@ export class HomeComponent implements OnInit {
     ),
   );
   readonly openFaq = signal<number | null>(0);
+  readonly contactMode = signal<'inquiry' | 'booking'>('inquiry');
 
   constructor(@Inject(DOCUMENT) private readonly document: Document) {}
 
@@ -171,6 +173,7 @@ export class HomeComponent implements OnInit {
 
   /** Uebernimmt das Kennenlernangebot in die Anfrage und springt dorthin. */
   requestOfferAppointment(): void {
+    this.contactMode.set('inquiry');
     this.inquiry().startFromOffer();
     void this.router.navigateByUrl('/kontakt').then(() => this.inquiry().focusStep());
   }
