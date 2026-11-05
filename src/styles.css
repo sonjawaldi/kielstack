@@ -1095,6 +1095,32 @@ body {
 }
 
 /* Zusammenarbeit */
+#prozess {
+  position: relative;
+  overflow: hidden;
+}
+
+#prozess > .wrap {
+  position: relative;
+}
+
+/* Reine Dekoration, deshalb als Pseudo-Element: Screenreader ueberspringen es. */
+#prozess::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -90px;
+  width: 500px;
+  aspect-ratio: 512 / 439;
+  background: url('/assets/brand/favicon.png') center / contain no-repeat;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+html.dark #prozess::before {
+  opacity: 0.2;
+}
+
 .steps {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -1947,6 +1973,11 @@ app-inquiry-form[hidden] {
   .offer-r .btn {
     padding: 14px 20px;
     font-size: 15px;
+  }
+
+  /* Auf dem Handy laege das K direkt hinter dem Text. */
+  #prozess::before {
+    display: none;
   }
 
   .steps {
