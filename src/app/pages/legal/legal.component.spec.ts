@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { LegalComponent, PRIVACYBEE_SCRIPT } from './legal.component';
+import { LegalComponent, PRIVACYBEE_WIDGETS } from './legal.component';
 
 describe('LegalComponent', () => {
   beforeEach(async () => {
@@ -11,9 +11,13 @@ describe('LegalComponent', () => {
     }).compileComponents();
   });
 
-  afterEach(() =>
-    document.querySelectorAll(`script[src="${PRIVACYBEE_SCRIPT}"]`).forEach((s) => s.remove()),
-  );
+  function scripts(src: string): HTMLScriptElement[] {
+    return Array.from(document.querySelectorAll<HTMLScriptElement>(`script[src="${src}"]`));
+  }
+
+  afterEach(() => {
+    for (const { src } of PRIVACYBEE_WIDGETS) scripts(src).forEach((script) => script.remove());
+  });
 
   function render(): HTMLElement {
     const fixture = TestBed.createComponent(LegalComponent);
@@ -31,14 +35,41 @@ describe('LegalComponent', () => {
     }
   });
 
-  it('nennt im Impressum die Angaben nach § 5 DDG mit eigener Anschrift', () => {
-    const imprint = render().querySelector('#impressum')!.textContent!;
+  it('bindet das Impressum ueber das PrivacyBee-Widget ein', () => {
+    const widget = render().querySelector('#impressum imprint-widget')!;
 
-    expect(imprint).toContain('§ 5 DDG');
-    expect(imprint).toContain('Sonja Waldenspuhl');
-    expect(imprint).toContain('24113 Kiel');
-    expect(imprint).toContain('business@kielstack.de');
-    expect(imprint).not.toContain('TMG');
+    expect(widget).not.toBeNull();
+    expect(widget.getAttribute('website-id')).toBe('cmwayyilz00a22zq998xmrt48');
+    expect(widget.getAttribute('lang')).toBe('de');
+  });
+
+  it('zeigt das eigene Impressum nach § 5 DDG, wenn PrivacyBee nicht erreichbar ist', () => {
+    const fixture = TestBed.createComponent(LegalComponent);
+    fixture.detectChanges();
+    const imprint = () => fixture.nativeElement.querySelector('#impressum').textContent as string;
+
+    expect(imprint()).not.toContain('§ 5 DDG');
+
+    const [imprintScript] = scripts(PRIVACYBEE_WIDGETS[0].src);
+    imprintScript.onerror!(new Event('error'));
+    fixture.detectChanges();
+
+    expect(imprint()).toContain('§ 5 DDG');
+    expect(imprint()).toContain('Sonja Waldenspuhl');
+    expect(imprint()).toContain('24113 Kiel');
+    expect(imprint()).toContain('business@kielstack.de');
+  });
+
+  it('zeigt einen Hinweis, wenn die Datenschutzerklaerung nicht geladen werden kann', () => {
+    const fixture = TestBed.createComponent(LegalComponent);
+    fixture.detectChanges();
+
+    scripts(PRIVACYBEE_WIDGETS[1].src)[0].onerror!(new Event('error'));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('#datenschutz').textContent).toContain(
+      'kann gerade nicht geladen werden',
+    );
   });
 
   it('verweist nicht mehr auf die Texte von sonjawaldenspuhl.de', () => {
@@ -68,10 +99,12 @@ describe('LegalComponent', () => {
     expect(widget.getAttribute('lang')).toBe('de');
   });
 
-  it('laedt das PrivacyBee-Skript genau einmal, auch beim zweiten Besuch', () => {
+  it('laedt jedes PrivacyBee-Skript genau einmal, auch beim zweiten Besuch', () => {
     render();
     render();
 
-    expect(document.querySelectorAll(`script[src="${PRIVACYBEE_SCRIPT}"]`).length).toBe(1);
+    for (const { src } of PRIVACYBEE_WIDGETS) {
+      expect(scripts(src).length).withContext(src).toBe(1);
+    }
   });
 });
