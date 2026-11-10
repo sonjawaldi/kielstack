@@ -1953,6 +1953,61 @@ app-booking {
   justify-content: center;
 }
 
+/* Rechtliche Seiten: Impressum, Datenschutz, Barrierefreiheit */
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 760px;
+  padding-top: 72px;
+  padding-bottom: 104px;
+  color: var(--body);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.legal section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+
+.legal h2 {
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.legal strong {
+  color: var(--ink);
+}
+
+.legal a {
+  color: var(--accent-text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.legal code {
+  font-size: 0.9em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---------- Schmal: Navigation klappt ein ---------- */
 @media (max-width: 860px) {
   .nav {

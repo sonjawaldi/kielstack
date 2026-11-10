@@ -1,6 +1,9 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { ErrorComponent } from './pages/error/error.component';
+import { ImprintComponent } from './pages/legal/imprint.component';
+import { PrivacyComponent } from './pages/legal/privacy.component';
+import { AccessibilityComponent } from './pages/legal/accessibility.component';
 
 /** Die Abschnitte der Startseite, die einen eigenen Pfad haben. */
 export const SECTIONS = ['angebot', 'leistungen', 'prozess', 'ueber-mich', 'kontakt'] as const;
@@ -27,5 +30,8 @@ export function homeMatcher(segments: UrlSegment[]): UrlMatchResult | null {
 
 export const routes: Routes = [
   { matcher: homeMatcher, component: HomeComponent },
+  { path: 'impressum', component: ImprintComponent, title: 'Impressum | Kielstack' },
+  { path: 'datenschutz', component: PrivacyComponent, title: 'Datenschutz | Kielstack' },
+  { path: 'barrierefreiheit', component: AccessibilityComponent, title: 'Barrierefreiheit | Kielstack' },
   { path: '**', component: ErrorComponent },
 ];
