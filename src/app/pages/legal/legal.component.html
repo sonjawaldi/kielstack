@@ -14,37 +14,42 @@
     <article class="legal-part" id="impressum" aria-labelledby="impressum-titel">
       <h2 class="h2" id="impressum-titel">Impressum</h2>
 
-      <h3>Angaben gemäß § 5 DDG</h3>
-      <address>
-        Sonja Waldenspuhl<br />
-        Kielstack – Digitale Lösungen für Unternehmen<br />
-        Danewerkstraße 21<br />
-        24113 Kiel<br />
-        Deutschland
-      </address>
+      <!-- Text kommt von PrivacyBee und wird dort gepflegt; das Skript laedt LegalComponent. -->
+      <imprint-widget website-id="cmwayyilz00a22zq998xmrt48" lang="de"></imprint-widget>
+      <!-- Ersatz, falls PrivacyBee nicht erreichbar ist: Das Impressum muss immer verfuegbar sein. -->
+      @if (failed().imprint) {
+        <h3>Angaben gemäß § 5 DDG</h3>
+        <address>
+          Sonja Waldenspuhl<br />
+          Kielstack – Digitale Lösungen für Unternehmen<br />
+          Danewerkstraße 21<br />
+          24113 Kiel<br />
+          Deutschland
+        </address>
 
-      <h3>Kontakt</h3>
-      <p>
-        E-Mail:
-        <a href="mailto:business&#64;kielstack.de">business&#64;kielstack.de</a><br />
-        Kontaktformular: <a routerLink="/kontakt">kielstack.de/kontakt</a>
-      </p>
+        <h3>Kontakt</h3>
+        <p>
+          E-Mail:
+          <a href="mailto:business&#64;kielstack.de">business&#64;kielstack.de</a><br />
+          Kontaktformular: <a routerLink="/kontakt">kielstack.de/kontakt</a>
+        </p>
 
-      <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
-      <p>Sonja Waldenspuhl, Anschrift wie oben</p>
+        <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+        <p>Sonja Waldenspuhl, Anschrift wie oben</p>
 
-      <h3>Verbraucherstreitbeilegung</h3>
-      <p>
-        Ich bin nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
-        Verbraucherschlichtungsstelle teilzunehmen.
-      </p>
+        <h3>Verbraucherstreitbeilegung</h3>
+        <p>
+          Ich bin nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+          Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
 
-      <h3>Haftung für Links</h3>
-      <p>
-        Für die Inhalte verlinkter externer Seiten sind ausschließlich deren Betreiber
-        verantwortlich. Werden mir Rechtsverstöße auf einer verlinkten Seite bekannt, entferne ich
-        den Link umgehend.
-      </p>
+        <h3>Haftung für Links</h3>
+        <p>
+          Für die Inhalte verlinkter externer Seiten sind ausschließlich deren Betreiber
+          verantwortlich. Werden mir Rechtsverstöße auf einer verlinkten Seite bekannt, entferne ich
+          den Link umgehend.
+        </p>
+      }
     </article>
 
     <!-- Barrierefreiheit -->
@@ -74,13 +79,13 @@
         type="dsgvo"
         lang="de"
       ></privacybee-widget>
-      <noscript>
+      @if (failed().privacy) {
         <p>
-          Die Datenschutzerklärung wird über PrivacyBee eingebunden und braucht JavaScript. Bei
-          Fragen zum Datenschutz schreiben Sie mir an
+          Die Datenschutzerklärung kann gerade nicht geladen werden. Bitte versuchen Sie es später
+          noch einmal. Bei Fragen zum Datenschutz schreiben Sie mir an
           <a href="mailto:business&#64;kielstack.de">business&#64;kielstack.de</a>.
         </p>
-      </noscript>
+      }
     </article>
 
     <p class="legal-updated">Stand: {{ updated }}</p>
