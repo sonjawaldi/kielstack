@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { LegalComponent } from './legal.component';
+import { LegalComponent, PRIVACYBEE_SCRIPT } from './legal.component';
 
 describe('LegalComponent', () => {
   beforeEach(async () => {
@@ -10,6 +10,10 @@ describe('LegalComponent', () => {
       providers: [provideRouter([])],
     }).compileComponents();
   });
+
+  afterEach(() =>
+    document.querySelectorAll(`script[src="${PRIVACYBEE_SCRIPT}"]`).forEach((s) => s.remove()),
+  );
 
   function render(): HTMLElement {
     const fixture = TestBed.createComponent(LegalComponent);
@@ -53,5 +57,21 @@ describe('LegalComponent', () => {
 
     fixture.destroy();
     expect(title.getTitle()).toBe('Kielstack');
+  });
+
+  it('bindet die Datenschutzerklaerung ueber das PrivacyBee-Widget ein', () => {
+    const widget = render().querySelector('#datenschutz privacybee-widget')!;
+
+    expect(widget).not.toBeNull();
+    expect(widget.getAttribute('website-id')).toBe('cmwayyilz00a22zq998xmrt48');
+    expect(widget.getAttribute('type')).toBe('dsgvo');
+    expect(widget.getAttribute('lang')).toBe('de');
+  });
+
+  it('laedt das PrivacyBee-Skript genau einmal, auch beim zweiten Besuch', () => {
+    render();
+    render();
+
+    expect(document.querySelectorAll(`script[src="${PRIVACYBEE_SCRIPT}"]`).length).toBe(1);
   });
 });
