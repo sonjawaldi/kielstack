@@ -1,9 +1,7 @@
 import { Routes, UrlMatchResult, UrlSegment } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { ErrorComponent } from './pages/error/error.component';
-import { ImprintComponent } from './pages/legal/imprint.component';
-import { PrivacyComponent } from './pages/legal/privacy.component';
-import { AccessibilityComponent } from './pages/legal/accessibility.component';
+import { LegalComponent } from './pages/legal/legal.component';
 
 /** Die Abschnitte der Startseite, die einen eigenen Pfad haben. */
 export const SECTIONS = ['angebot', 'leistungen', 'prozess', 'ueber-mich', 'kontakt'] as const;
@@ -28,10 +26,28 @@ export function homeMatcher(segments: UrlSegment[]): UrlMatchResult | null {
   return null;
 }
 
+/**
+ * Impressum, Datenschutz und Barrierefreiheit stehen zusammen auf einer Seite.
+ * /rechtliches zeigt sie von oben, die drei bekannten Pfade springen direkt in
+ * ihren Abschnitt - wer kielstack.de/impressum eintippt, landet also richtig.
+ */
+export const LEGAL_SECTIONS = ['impressum', 'datenschutz', 'barrierefreiheit'] as const;
+
+/** Ein Eintrag fuer alle Pfade, aus demselben Grund wie bei homeMatcher. */
+export function legalMatcher(segments: UrlSegment[]): UrlMatchResult | null {
+  if (segments.length !== 1) return null;
+
+  const [segment] = segments;
+  if (segment.path === 'rechtliches') return { consumed: segments };
+  if ((LEGAL_SECTIONS as readonly string[]).includes(segment.path)) {
+    return { consumed: segments, posParams: { section: segment } };
+  }
+
+  return null;
+}
+
 export const routes: Routes = [
   { matcher: homeMatcher, component: HomeComponent },
-  { path: 'impressum', component: ImprintComponent, title: 'Impressum | Kielstack' },
-  { path: 'datenschutz', component: PrivacyComponent, title: 'Datenschutz | Kielstack' },
-  { path: 'barrierefreiheit', component: AccessibilityComponent, title: 'Barrierefreiheit | Kielstack' },
+  { matcher: legalMatcher, component: LegalComponent },
   { path: '**', component: ErrorComponent },
 ];

@@ -1,0 +1,93 @@
+<section class="sec legal" aria-labelledby="legal-titel">
+  <div class="wrap legal-wrap">
+    <header class="legal-head">
+      <span class="eyebrow">Rechtliches</span>
+      <h1 class="h1" id="legal-titel">Impressum, Barrierefreiheit und Datenschutz</h1>
+      <nav class="legal-toc" aria-label="Auf dieser Seite">
+        <a routerLink="/impressum">Impressum</a>
+        <a routerLink="/barrierefreiheit">Barrierefreiheit</a>
+        <a routerLink="/datenschutz">Datenschutz</a>
+      </nav>
+    </header>
+
+    <!-- Impressum -->
+    <article class="legal-part" id="impressum" aria-labelledby="impressum-titel">
+      <h2 class="h2" id="impressum-titel">Impressum</h2>
+
+      <!-- Text kommt von PrivacyBee und wird dort gepflegt; das Skript laedt LegalComponent. -->
+      <imprint-widget website-id="cmwayyilz00a22zq998xmrt48" lang="de"></imprint-widget>
+      <!-- Ersatz, falls PrivacyBee nicht erreichbar ist: Das Impressum muss immer verfuegbar sein. -->
+      @if (failed().imprint) {
+        <h3>Angaben gemäß § 5 DDG</h3>
+        <address>
+          Sonja Waldenspuhl<br />
+          Kielstack – Digitale Lösungen für Unternehmen<br />
+          Charles-Roß-Ring 20<br />
+          24106 Kiel<br />
+          Deutschland
+        </address>
+
+        <h3>Kontakt</h3>
+        <p>
+          E-Mail:
+          <a href="mailto:business&#64;kielstack.de">business&#64;kielstack.de</a><br />
+          Kontaktformular: <a routerLink="/kontakt">kielstack.de/kontakt</a>
+        </p>
+
+        <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+        <p>Sonja Waldenspuhl, Anschrift wie oben</p>
+
+        <h3>Verbraucherstreitbeilegung</h3>
+        <p>
+          Ich bin nicht bereit und nicht verpflichtet, an Streitbeilegungsverfahren vor einer
+          Verbraucherschlichtungsstelle teilzunehmen.
+        </p>
+
+        <h3>Haftung für Links</h3>
+        <p>
+          Für die Inhalte verlinkter externer Seiten sind ausschließlich deren Betreiber
+          verantwortlich. Werden mir Rechtsverstöße auf einer verlinkten Seite bekannt, entferne ich
+          den Link umgehend.
+        </p>
+      }
+    </article>
+
+    <!-- Barrierefreiheit -->
+    <article class="legal-part" id="barrierefreiheit" aria-labelledby="barrierefreiheit-titel">
+      <h2 class="h2" id="barrierefreiheit-titel">Barrierefreiheit</h2>
+      <p>
+        Diese Website soll für alle gut nutzbar sein. Ich orientiere mich dabei an den Web Content
+        Accessibility Guidelines (WCAG) 2.1 auf Stufe AA: Die Seiten lassen sich vollständig mit der
+        Tastatur bedienen, haben eine klare Überschriftenstruktur, Alternativtexte für Bilder,
+        ausreichende Kontraste in hellem und dunklem Modus und passen sich jeder Bildschirmbreite
+        an.
+      </p>
+      <p>
+        Wenn Ihnen trotzdem eine Barriere auffällt oder Sie Inhalte in einer anderen Form brauchen,
+        schreiben Sie mir bitte an
+        <a href="mailto:business&#64;kielstack.de">business&#64;kielstack.de</a>. Ich melde mich
+        zeitnah und behebe das Problem so schnell wie möglich.
+      </p>
+    </article>
+
+    <!-- Datenschutz -->
+    <article class="legal-part" id="datenschutz" aria-labelledby="datenschutz-titel">
+      <h2 class="h2" id="datenschutz-titel">Datenschutzerklärung</h2>
+      <!-- Text kommt von PrivacyBee und wird dort gepflegt; das Skript laedt LegalComponent. -->
+      <privacybee-widget
+        website-id="cmwayyilz00a22zq998xmrt48"
+        type="dsgvo"
+        lang="de"
+      ></privacybee-widget>
+      @if (failed().privacy) {
+        <p>
+          Die Datenschutzerklärung kann gerade nicht geladen werden. Bitte versuchen Sie es später
+          noch einmal. Bei Fragen zum Datenschutz schreiben Sie mir an
+          <a href="mailto:business&#64;kielstack.de">business&#64;kielstack.de</a>.
+        </p>
+      }
+    </article>
+
+    <p class="legal-updated">Stand: {{ updated }}</p>
+  </div>
+</section>
