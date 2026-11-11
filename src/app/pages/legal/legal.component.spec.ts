@@ -56,7 +56,7 @@ describe('LegalComponent', () => {
 
     expect(imprint()).toContain('§ 5 DDG');
     expect(imprint()).toContain('Sonja Waldenspuhl');
-    expect(imprint()).toContain('24113 Kiel');
+    expect(imprint()).toContain('24106 Kiel');
     expect(imprint()).toContain('business@kielstack.de');
   });
 
