@@ -1,40 +1,57 @@
 <div class="form">
   @switch (state()) {
-    @case ('loading') {
+    @case ("loading") {
       <div class="fstep" role="status">
         <h3 id="booking-heading" tabindex="-1">Termin anfragen</h3>
         <p class="hint">Freie Termine werden geladen …</p>
       </div>
     }
 
-    @case ('failed') {
+    @case ("failed") {
       <div class="fstep">
         <h3 id="booking-heading" tabindex="-1">Termin anfragen</h3>
-        <p class="notice bad" role="alert">Die freien Termine lassen sich gerade nicht laden.</p>
+        <p class="notice bad" role="alert">
+          Die freien Termine lassen sich gerade nicht laden.
+        </p>
         <div class="fnav">
-          <button type="button" class="btn btn-s" (click)="load()">Erneut versuchen</button>
-          <button type="button" class="btn btn-p" (click)="switchToInquiry.emit()">
+          <button type="button" class="btn btn-s" (click)="load()">
+            Erneut versuchen
+          </button>
+          <button
+            type="button"
+            class="btn btn-p"
+            (click)="switchToInquiry.emit()"
+          >
             Anfrage schreiben
           </button>
         </div>
       </div>
     }
 
-    @case ('sent') {
+    @case ("sent") {
       <div class="fstep thanks" role="status">
         <span class="thanks-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12l5 5L20 7"></path>
+          </svg>
         </span>
-        <h3 id="booking-heading" tabindex="-1">Danke – Ihre Terminanfrage ist da.</h3>
+        <h3 id="booking-heading" tabindex="-1">Danke!</h3>
         <p>
-          Ihr Wunschtermin: <b>{{ selectedLabel() }}</b
-          >. Der Termin steht, sobald ich ihn Ihnen per E-Mail bestätigt habe. Moin und bis bald!
+          Ihre Anfrage für <b>{{ selectedLabel() }}</b> ist eingegangen. Ich
+          bestätige sie Ihnen per Mail.
         </p>
         <div class="thanks-by">
-          <img src="assets/sonja-waldenspuhl-avatar.jpg" alt="" width="160" height="160" />
+          <img
+            src="assets/sonja-waldenspuhl-avatar.jpg"
+            alt=""
+            width="160"
+            height="160"
+          />
           <b>Sonja</b>
         </div>
-        <button type="button" class="linkbtn" (click)="restart()">Weiteren Termin anfragen</button>
+        <button type="button" class="linkbtn" (click)="restart()">
+          Weiteren Termin anfragen
+        </button>
       </div>
     }
 
@@ -48,7 +65,8 @@
       >
         <h3 id="booking-heading" tabindex="-1">Wann passt es Ihnen?</h3>
         <p class="hint">
-          {{ slotMinutes() }} Minuten Erstgespräch, unverbindlich. Alle Zeiten in deutscher Zeit.
+          {{ slotMinutes() }} Minuten Erstgespräch, unverbindlich. Alle Zeiten
+          in deutscher Zeit.
         </p>
 
         @if (errorMessage()) {
@@ -58,7 +76,11 @@
         @if (days().length === 0) {
           <p class="notice">Gerade ist online kein Termin frei.</p>
           <div class="fnav end">
-            <button type="button" class="btn btn-p" (click)="switchToInquiry.emit()">
+            <button
+              type="button"
+              class="btn btn-p"
+              (click)="switchToInquiry.emit()"
+            >
               Anfrage schreiben
             </button>
           </div>
@@ -112,10 +134,14 @@
                   minlength="2"
                   [(ngModel)]="name"
                   [attr.aria-invalid]="!!fieldErrors()['name']"
-                  [attr.aria-describedby]="fieldErrors()['name'] ? 'booking-name-error' : null"
+                  [attr.aria-describedby]="
+                    fieldErrors()['name'] ? 'booking-name-error' : null
+                  "
                 />
-                @if (fieldErrors()['name']) {
-                  <p class="err" id="booking-name-error">{{ fieldErrors()['name'] }}</p>
+                @if (fieldErrors()["name"]) {
+                  <p class="err" id="booking-name-error">
+                    {{ fieldErrors()["name"] }}
+                  </p>
                 }
               </div>
               <div>
@@ -129,21 +155,27 @@
                   email
                   [(ngModel)]="email"
                   [attr.aria-invalid]="!!fieldErrors()['email']"
-                  [attr.aria-describedby]="fieldErrors()['email'] ? 'booking-email-error' : null"
+                  [attr.aria-describedby]="
+                    fieldErrors()['email'] ? 'booking-email-error' : null
+                  "
                 />
-                @if (fieldErrors()['email']) {
-                  <p class="err" id="booking-email-error">{{ fieldErrors()['email'] }}</p>
+                @if (fieldErrors()["email"]) {
+                  <p class="err" id="booking-email-error">
+                    {{ fieldErrors()["email"] }}
+                  </p>
                 }
               </div>
             </div>
 
             <div>
-              <label for="booking-note">Worum geht es? <small>optional</small></label>
+              <label for="booking-note"
+                >Worum geht es? <small>optional</small></label
+              >
               <textarea
                 id="booking-note"
                 name="note"
                 rows="3"
-                maxlength="4500"
+                maxlength="2000"
                 [(ngModel)]="note"
               ></textarea>
             </div>
@@ -161,14 +193,14 @@
             </div>
 
             <p class="legal-note">
-              Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer Angaben zur Beantwortung
-              der Anfrage einverstanden.
+              Mit dem Absenden erklären Sie sich mit der Verarbeitung Ihrer
+              Angaben zur Beantwortung der Anfrage einverstanden.
               <a href="/datenschutz" target="_blank">Datenschutz</a>
             </p>
 
             <div class="fnav end">
               <button type="submit" class="btn btn-p" [disabled]="sending()">
-                {{ sending() ? 'Wird gesendet …' : 'Termin anfragen' }}
+                {{ sending() ? "Wird gesendet …" : "Termin anfragen" }}
               </button>
             </div>
           }

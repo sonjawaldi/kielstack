@@ -1,17 +1,21 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgForm } from '@angular/forms';
-import { of, throwError } from 'rxjs';
-import { BookingService } from '../../services/booking.service';
-import { BookingComponent } from './booking.component';
+import { HttpErrorResponse } from "@angular/common/http";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { NgForm } from "@angular/forms";
+import { of, throwError } from "rxjs";
+import { BookingService } from "../../services/booking.service";
+import { BookingComponent } from "./booking.component";
 
 const RESPONSE = {
-  timeZone: 'Europe/Berlin',
+  timeZone: "Europe/Berlin",
   slotMinutes: 30,
-  slots: ['2026-11-09T09:00:00.000Z', '2026-11-09T09:30:00.000Z', '2026-11-10T14:00:00.000Z'],
+  slots: [
+    "2026-11-09T09:00:00.000Z",
+    "2026-11-09T09:30:00.000Z",
+    "2026-11-10T14:00:00.000Z",
+  ],
 };
 
-describe('BookingComponent', () => {
+describe("BookingComponent", () => {
   let fixture: ComponentFixture<BookingComponent>;
   let component: BookingComponent;
   let loadSlots: jasmine.Spy;
@@ -26,38 +30,50 @@ describe('BookingComponent', () => {
   }
 
   function text(): string {
-    return (fixture.nativeElement as HTMLElement).textContent ?? '';
+    return (fixture.nativeElement as HTMLElement).textContent ?? "";
   }
 
   beforeEach(async () => {
-    loadSlots = jasmine.createSpy('loadSlots').and.returnValue(of(RESPONSE));
-    requestAppointment = jasmine.createSpy('requestAppointment').and.returnValue(of({ ok: true }));
+    loadSlots = jasmine.createSpy("loadSlots").and.returnValue(of(RESPONSE));
+    requestAppointment = jasmine
+      .createSpy("requestAppointment")
+      .and.returnValue(of({ ok: true }));
 
     await TestBed.configureTestingModule({
       imports: [BookingComponent],
-      providers: [{ provide: BookingService, useValue: { loadSlots, requestAppointment } }],
+      providers: [
+        {
+          provide: BookingService,
+          useValue: { loadSlots, requestAppointment },
+        },
+      ],
     }).compileComponents();
   });
 
-  it('gruppiert Slots nach Tag und zeigt sie in Berliner Zeit', () => {
+  it("gruppiert Slots nach Tag und zeigt sie in Berliner Zeit", () => {
     create();
 
     expect(component.days().length).toBe(2);
-    expect(component.days()[0].slots.map((slot) => slot.time)).toEqual(['10:00', '10:30']);
-    expect(text()).toContain('10:30');
+    expect(component.days()[0].slots.map((slot) => slot.time)).toEqual([
+      "10:00",
+      "10:30",
+    ]);
+    expect(text()).toContain("10:30");
   });
 
-  it('zeigt die Kontaktfelder erst nach der Wahl einer Uhrzeit', () => {
+  it("zeigt die Kontaktfelder erst nach der Wahl einer Uhrzeit", () => {
     create();
-    expect(fixture.nativeElement.querySelector('#booking-email')).toBeNull();
+    expect(fixture.nativeElement.querySelector("#booking-email")).toBeNull();
 
     component.start.set(RESPONSE.slots[0]);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('#booking-email')).not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector("#booking-email"),
+    ).not.toBeNull();
   });
 
-  it('verwirft die Uhrzeit beim Wechsel des Tages', () => {
+  it("verwirft die Uhrzeit beim Wechsel des Tages", () => {
     create();
     component.start.set(RESPONSE.slots[0]);
 
@@ -66,28 +82,41 @@ describe('BookingComponent', () => {
     expect(component.start()).toBeNull();
   });
 
-  it('sendet den gewaehlten Termin und bedankt sich', () => {
+  it("sendet den gewaehlten Termin und bedankt sich", () => {
     create();
     component.start.set(RESPONSE.slots[1]);
-    component.name = 'Erika Muster';
-    component.email = 'erika@example.com';
+    component.name = "Erika Muster";
+    component.email = "erika@example.com";
 
     component.submit(validForm);
     fixture.detectChanges();
 
     expect(requestAppointment).toHaveBeenCalledWith(
-      jasmine.objectContaining({ name: 'Erika Muster', start: RESPONSE.slots[1] }),
+      jasmine.objectContaining({
+        name: "Erika Muster",
+        start: RESPONSE.slots[1],
+      }),
     );
-    expect(text()).toContain('Terminanfrage ist da');
-    expect(text()).toContain('10:30');
+    expect(text()).toContain("ist eingegangen");
+    expect(text()).toContain("per Mail");
+    expect(text()).toContain("10:30");
   });
 
-  it('laedt neu und behaelt die Eingaben, wenn der Termin vergeben wurde', () => {
+  it("laedt neu und behaelt die Eingaben, wenn der Termin vergeben wurde", () => {
     create();
     component.start.set(RESPONSE.slots[0]);
-    component.name = 'Erika Muster';
+    component.name = "Erika Muster";
     requestAppointment.and.returnValue(
-      throwError(() => new HttpErrorResponse({ status: 409 })),
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            error: {
+              message:
+                "Dieser Termin ist leider nicht mehr frei – bitte einen anderen wählen",
+            },
+          }),
+      ),
     );
 
     component.submit(validForm);
@@ -95,26 +124,61 @@ describe('BookingComponent', () => {
 
     expect(loadSlots).toHaveBeenCalledTimes(2);
     expect(component.start()).toBeNull();
-    expect(component.name).toBe('Erika Muster');
-    expect(text()).toContain('vergeben');
+    expect(component.name).toBe("Erika Muster");
+    expect(text()).toContain("vergeben");
   });
 
-  it('bietet das Anfrageformular an, wenn der Kalender nicht antwortet', () => {
-    loadSlots.and.returnValue(throwError(() => new HttpErrorResponse({ status: 503 })));
+  it("zeigt Feldfehler des CRM, ohne die Termine neu zu laden", () => {
     create();
-    const switched = jasmine.createSpy('switched');
+    component.start.set(RESPONSE.slots[0]);
+    requestAppointment.and.returnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            error: { issues: [{ path: "email", message: "Ungültig" }] },
+          }),
+      ),
+    );
+
+    component.submit(validForm);
+
+    expect(loadSlots).toHaveBeenCalledTimes(1);
+    expect(component.fieldErrors()).toEqual({ email: "Ungültig" });
+  });
+
+  it("meldet sich freundlich bei zu vielen Anfragen", () => {
+    create();
+    component.start.set(RESPONSE.slots[0]);
+    requestAppointment.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 429 })),
+    );
+
+    component.submit(validForm);
+
+    expect(component.errorMessage()).toContain("später");
+  });
+
+  it("bietet das Anfrageformular an, wenn der Kalender nicht antwortet", () => {
+    loadSlots.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 503 })),
+    );
+    create();
+    const switched = jasmine.createSpy("switched");
     component.switchToInquiry.subscribe(switched);
 
-    (fixture.nativeElement.querySelector('.btn-p') as HTMLButtonElement).click();
+    (
+      fixture.nativeElement.querySelector(".btn-p") as HTMLButtonElement
+    ).click();
 
-    expect(text()).toContain('nicht laden');
+    expect(text()).toContain("nicht laden");
     expect(switched).toHaveBeenCalled();
   });
 
-  it('sagt es offen, wenn kein Termin frei ist', () => {
+  it("sagt es offen, wenn kein Termin frei ist", () => {
     loadSlots.and.returnValue(of({ ...RESPONSE, slots: [] }));
     create();
 
-    expect(text()).toContain('kein Termin frei');
+    expect(text()).toContain("kein Termin frei");
   });
 });
